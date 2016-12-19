@@ -73,3 +73,7 @@ function hook_jsld_alter(&$jsld) {
   $jsld['@context'] = 'http://schema.org';
 }
 ~~~
+
+## Copyright
+
+Created by Niklan. This module is custom and have no project on drupal.org. So for all updates and info go to [Github project page](https://github.com/Niklan/jsld).

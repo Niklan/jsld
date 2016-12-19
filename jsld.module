@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * @file
+ *   Main file for hooks.
+ */
+
+/**
+ * Implements hook_hook_info().
+ */
+function jsld_hook_info() {
+  $hooks['jsld_info'] = array(
+    'group' => 'jsld',
+  );
+
+  return $hooks;
+}
+
+/**
+ * All information about hooks.
+ * @return array|mixed
+ */
+function jsld_info() {
+  $result = &drupal_static(__FUNCTION__);
+  if (!isset($data)) {
+    $result = array();
+    foreach (module_implements('jsld_info') as $module) {
+      $result[$module] = module_invoke($module, 'jsld_info');
+
+      // Load files which declared in hook.
+      foreach ($result[$module] as $hook_info) {
+        if (isset($hook_info['file'])) {
+          $filename = $hook_info['file'];
+
+          if (isset($hook_info['path'])) {
+            require_once DRUPAL_ROOT . '/' . $hook_info['path'] . "/$filename";
+          }
+          else {
+            require_once DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . "/$filename";
+          }
+        }
+      }
+    }
+  }
+
+  drupal_alter('jsld_info', $result);
+
+  return $result;
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function jsld_preprocess_html(&$variables) {
+  $hooks = jsld_info();
+  $jsld = array();
+
+  foreach ($hooks as $module => $info) {
+    foreach ($info  as $name => $data) {
+      if (function_exists($data['callback'])) {
+        $function = $data['callback'];
+        $result = $function($variables);
+        $jsld = array_merge($jsld, $result);
+      }
+    }
+  }
+
+  drupal_alter('jsld', $jsld);
+
+  if (!empty($jsld)) {
+    $script = array(
+      '#tag' => 'script',
+      '#attributes' => array('type' => 'application/ld+json'),
+      '#value' => json_encode($jsld),
+    );
+    drupal_add_html_head($script, 'json-ld');
+  }
+}

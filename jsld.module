@@ -60,7 +60,9 @@ function jsld_preprocess_html(&$variables) {
       if (function_exists($data['callback'])) {
         $function = $data['callback'];
         $result = $function($variables);
-        $jsld = array_merge($jsld, $result);
+        if (!empty($result)) {
+          $jsld = array_merge($jsld, $result);
+        }
       }
     }
   }

@@ -116,7 +116,7 @@ function jsld_entity_limit($bundle, $view_mode, $limits = array()) {
     }
 
     list($limit_bundle, $limit_view_mode) = explode('|', $limit);
-    if (($bundle == $limit_bundle || $bundle == '*') && ($view_mode == $limit_view_mode || $view_mode == '*')) {
+    if (($bundle == $limit_bundle || $limit_bundle == '*') && ($view_mode == $limit_view_mode || $limit_view_mode == '*')) {
       $valid = TRUE;
       break;
     }

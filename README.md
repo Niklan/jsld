@@ -13,16 +13,19 @@ For more information you can check **jsld.api.php** file.
  * Implements hook_jsld_info().
  */
 function MYMODULE_jsld_info() {
+  // Without any additional data, this callback will be called on every page
+  // load during preprocessing html. You can access $variables data from argument.
   $items['news'] = array(
     'callback' => 'MYMODULE_jsld_news',
   );
+  
   return $items;
 }
 
 /**
  * Json-LD definition for news.
  */
-function MYMODULE_jsld_news() {
+function MYMODULE_jsld_news(&$vars) {
   $result = array();
   if ($node = menu_get_object() && $node->type == 'news') {
     $result[] = array(
@@ -37,7 +40,46 @@ function MYMODULE_jsld_news() {
 }
 ~~~
 
-This simple code define 'news' info hook for current module with callback function 'MYMODULE_ksld_news' which will be called during page generation. Here you can add all JSON-LD information what you want.
+This simple code define 'news' info hook for current module with callback function 'MYMODULE_jsld_news' which will be called during page generation. Here you can add all JSON-LD information what you want.
+
+~~~php
+/**
+ * Implements hook_jsld_info().
+ */
+function MYMODULE_jsld_info() {
+  // This hook will be called only for entity type of node during entity view 
+  // preparation. It's called on every page where this entity appears.
+  $items['news'] = array(
+    'callback' => 'MYMODULE_jsld_news',
+    'entity' => 'node',
+  );
+  
+  return $items;
+}
+
+function MYMODULE_jsld_news($jsld) {}
+~~~
+
+~~~php
+/**
+ * Implements hook_jsld_info().
+ */
+function MYMODULE_jsld_info() {
+  // This hook will be called only for entity type of node and bundle news.
+  // Also it will be called just for teaser view mode of entity. You
+  // can set multiple variations and user * for wildcard.
+  // F.e. array('news|*', '*|full')
+  $items['news'] = array(
+    'callback' => 'MYMODULE_jsld_news',
+    'entity' => 'node',
+    'entity_limit' => array('news|teaser'),
+  );
+  
+  return $items;
+}
+
+function MYMODULE_jsld_news($jsld) {}
+~~~
 
 ### Tip 1
 
@@ -71,6 +113,57 @@ This can help you to midfy ready to render data. This  called just before `json_
  */
 function hook_jsld_alter(&$jsld) {
   $jsld['@context'] = 'http://schema.org';
+}
+~~~
+
+## Add data from anywhere.
+
+You can easily add data from every place you like. Use `jsld_push_data()` for this.
+
+F.e. add Review schema.org for entity type `node` and bundle `testimonial`.
+
+~~~php
+/**
+ * Implements hook_entity_view().
+ */
+function germes_entity_view($entity, $type, $view_mode, $langcode) {
+  global $base_url;
+
+  if ($type == 'node' && $entity->type == 'testimonial') {
+    $wrapper = entity_metadata_wrapper('node', $entity);
+    $nid = $wrapper->getIdentifier();
+    $body = $wrapper->body->value();
+
+    dpm($wrapper->getPropertyInfo());
+    $jsld = array(
+      '@context' => 'http://schema.org',
+      '@type' => 'Review',
+      'author' => array(
+        '@type' => 'Person',
+        'name' => $wrapper->field_testimonial_name->value(),
+      ),
+      'url' => "$base_url/testimonials#testimonial-$nid",
+      'datePublished' => date('c', $entity->created),
+      'description' => $body['safe_value'],
+      'inLanguage' => $langcode,
+      'itemReviewed' => array(
+        '@type' => 'Organization',
+        'name' => variable_get('site_name', ''),
+        'sameAs' => $base_url,
+        'url' => $base_url,
+
+      ),
+      'reviewRating' =>  array(
+        '@type' => 'Rating',
+        'worstRating' => 1,
+        'bestRating' => 5,
+        'ratingValue' => 5,
+      ),
+    );
+
+    // And finally push data.
+    jsld_push_data($jsld);
+  }
 }
 ~~~
 

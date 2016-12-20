@@ -18,7 +18,7 @@ function MYMODULE_jsld_info() {
   $items['news'] = array(
     'callback' => 'MYMODULE_jsld_news',
   );
-  
+
   return $items;
 }
 
@@ -47,13 +47,13 @@ This simple code define 'news' info hook for current module with callback functi
  * Implements hook_jsld_info().
  */
 function MYMODULE_jsld_info() {
-  // This hook will be called only for entity type of node during entity view 
+  // This hook will be called only for entity type of node during entity view
   // preparation. It's called on every page where this entity appears.
   $items['news'] = array(
     'callback' => 'MYMODULE_jsld_news',
     'entity' => 'node',
   );
-  
+
   return $items;
 }
 
@@ -74,7 +74,7 @@ function MYMODULE_jsld_info() {
     'entity' => 'node',
     'entity_limit' => array('news|teaser'),
   );
-  
+
   return $items;
 }
 
@@ -164,6 +164,61 @@ function germes_entity_view($entity, $type, $view_mode, $langcode) {
     // And finally push data.
     jsld_push_data($jsld);
   }
+}
+~~~
+
+The same code above but using hook.
+
+~~~php
+/**
+ * Implements hook_jsld_info().
+ */
+function MYMODULE_jsld_info() {
+  $items['testimonial_teaser'] = array(
+    'callback' => 'MYMODULE_jsld_testimonial_teaser',
+    'entity' => 'node',
+    'entity_limit' => array('testimonial|teaser'),
+  );
+
+  return $items;
+}
+
+/**
+ * Testimonial teaser.
+ */
+function MYMODULE_jsld_testimonial_teaser($jsld) {
+  global $base_url;
+  $wrapper = entity_metadata_wrapper('node', $jsld['entity']);
+  $nid = $wrapper->getIdentifier();
+  $body = $wrapper->body->value();
+
+  $jsld = array(
+    '@context' => 'http://schema.org',
+    '@type' => 'Review',
+    'author' => array(
+      '@type' => 'Person',
+      'name' => $wrapper->field_testimonial_name->value(),
+    ),
+    'url' => "$base_url/testimonials#testimonial-$nid",
+    'datePublished' => date('c', $wrapper->created->value()),
+    'description' => $body['safe_value'],
+    'inLanguage' => $jsld['langcode'],
+    'itemReviewed' => array(
+      '@type' => 'Organization',
+      'name' => variable_get('site_name', ''),
+      'sameAs' => $base_url,
+      'url' => $base_url,
+
+    ),
+    'reviewRating' =>  array(
+      '@type' => 'Rating',
+      'worstRating' => 1,
+      'bestRating' => 5,
+      'ratingValue' => 5,
+    ),
+  );
+
+  return $jsld;
 }
 ~~~
 

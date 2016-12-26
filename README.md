@@ -154,6 +154,8 @@ function MYMODULE_jsld_testimonials($entity_info) {
 }
 ~~~
 
+![Testimonial at Google test](http://i.imgur.com/jJzjHhF.png)
+
 ### Example 2 - Schema.org product
 
 This examples based on drupal_commerce product display node which referenced to product bundle of commerce_product entity.
@@ -175,7 +177,7 @@ function MYMODULE_jsld_info() {
 /**
  * Product Schema.org
  */
-function MYMODULE_jsld_testimonials($entity_info) {
+function MYMODULE_jsld_product($entity_info) {
   global $base_url;
   $wrapper = entity_metadata_wrapper('node', $entity_info['entity']);
   
@@ -201,6 +203,93 @@ function MYMODULE_jsld_testimonials($entity_info) {
   return $jsld;
 }
 ~~~
+
+![Product at Google test](http://i.imgur.com/Nl5XIGR.png)
+
+Example of result in Google search. This page also contains testimonial(s) from above example.
+
+![Product in search](http://i.imgur.com/oc9qI5Y.png)
+
+### Example 3 - Schema.org article
+
+~~~php
+/**
+ * Implements hook_jsld_info().
+ */
+function MYMODULE_jsld_info() {
+  $items['article'] = array(
+    'callback' => 'MYMODULE_jsld_article',
+    'entity' => 'node',
+    'entity_limit' => array('article|*'),
+  );
+
+  return $items;
+}
+
+/**
+ * Product Schema.org
+ */
+function MYMODULE_jsld_article($entity_info) {
+  global $base_url;
+  $wrapper = entity_metadata_wrapper('node', $entity_info['entity']);
+  $body = $wrapper->body->value();
+  $logo_path = "$base_url/" . drupal_get_path('theme', 'THEME_NAME') . "/logo.png";
+  // For better performance try to avoid using getimagesize() for logo, cuz they are static.
+  $logo_width = '500px';
+  $logo_height = '200px';
+
+  $jsld = array(
+    '@context' => 'http://schema.org',
+    '@type' => 'Article',
+    'name' => $wrapper->label(),
+    'headline' => $wrapper->label(),
+    'articleBody' => strip_tags($body['safe_value']),
+    'description' => strip_tags($body['safe_value']),
+    'url' => $wrapper->url->value(),
+    'mainEntityOfPage' => $wrapper->url->value(),
+    'datePublished' => date('c', $wrapper->created->value()),
+    'dateModified' => date('c', $wrapper->changed->value()),
+    'author' => array(
+      '@type' => 'Organization',
+      'name' => variable_get('site_name', ''),
+      'sameAs' => $base_url,
+      'url' => $base_url,
+      'logo' => array(
+        '@type' => 'ImageObject',
+        'url' => $logo_path,
+        'width' => $logo_width,
+        'height' => $logo_height,
+      ),
+    ),
+    'publisher' => array(
+      '@type' => 'Organization',
+      'name' => variable_get('site_name', ''),
+      'sameAs' => $base_url,
+      'url' => $base_url,
+      'logo' => array(
+        '@type' => 'ImageObject',
+        'url' => $logo_path,
+        'width' => $logo_width,
+        'height' => $logo_height,
+      ),
+    ),
+  );
+
+  if ($promo_image = $wrapper->field_article_promo->value()) {
+    $jsld['image'] = array(
+      '@type' => 'ImageObject',
+      'url' => image_style_url('article_teaser_promo', $promo_image['uri']),
+      // We use image style above, which have static width and height.
+      'width' => '320px',
+      'height' => '150px',
+    );
+  }
+  
+  return $jsld;
+}
+~~~
+
+![Article at Google test](http://i.imgur.com/BvUaJUs.png)
 
 ## Copyright
 

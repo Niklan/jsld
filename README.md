@@ -116,7 +116,7 @@ function MYMODULE_jsld_info() {
 }
 
 /**
- * Testimonial teaser.
+ * Testimonial Schema.org.
  */
 function MYMODULE_jsld_testimonials($entity_info) {
   global $base_url;
@@ -150,6 +150,53 @@ function MYMODULE_jsld_testimonials($entity_info) {
     ),
   );
 
+  return $jsld;
+}
+~~~
+
+### Example 2 - Schema.org product
+
+This examples based on drupal_commerce product display node which referenced to product bundle of commerce_product entity.
+
+~~~php
+/**
+ * Implements hook_jsld_info().
+ */
+function MYMODULE_jsld_info() {
+  $items['product'] = array(
+    'callback' => 'MYMODULE_jsld_product',
+    'entity' => 'node',
+    'entity_limit' => array('product_display|*'),
+  );
+
+  return $items;
+}
+
+/**
+ * Product Schema.org
+ */
+function MYMODULE_jsld_testimonials($entity_info) {
+  global $base_url;
+  $wrapper = entity_metadata_wrapper('node', $entity_info['entity']);
+  
+  $description = $wrapper->body->value();
+  $photo_file = $wrapper->field_products[0]->field_product_photos[0]->value()
+  $photo = image_style_url('medium', $photo_file['uri']);
+  $price = $wrapper->field_products[0]->commerce_price->value();
+  
+  $jsld = array(
+    '@context' => 'http://schema.org',
+    '@type' => 'Product',
+    'name' => $wrapper->label(),
+    'description' => strip_tags($description['safe_value']),
+    'image' => $photo,
+    'offers' => array(
+      '@type' => 'Offer',
+      'priceCurrency' => $price['currency_code'],
+      'price' => commerce_currency_amount_to_decimal($price['amount'], $price['currency_code']),
+    ),
+  );
+  
   return $jsld;
 }
 ~~~

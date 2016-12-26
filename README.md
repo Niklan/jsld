@@ -6,92 +6,63 @@ Module doesn't do nothing without you, it's just help you to organize your Json-
 
 For more information you can check **jsld.api.php** file.
 
-## Define your Json-LD info.
+## Hooks
+
+### hook_jsld_info().
+
+This hook help you to define custom callbacks for different cases, also you can strict
+this callbacks to specific entity type and bundle.
+
+This hook has group "jsld", so you can create **MYMODULE.jsld.inc** in the root of your module, and this file will be included before calling info hook and callbacks.
+
+**Return values**
+
+An associative array of jsld callbacks. They key is name for callback, nothing else.
+
+* **'callback'**: _(required)_ A function name which will be called.
+* **'file'**: _(optional)_ A file that will be included before callback is called.
+* **'path'**: _(optional)_ The path to directory containing the file from "file" parameter above. By default uses root of the module implementing the hook.
+* **'entity'**: _(optional)_ An entity machine name to which you can attach callback. If you fill this, callback will be called only when on page rendered one or more entity of this type. When you set this, all information about entity will be passed to first argument.
+* **'entity_limit'**: _(optional)_ An array with limitation for entity. You can limit callback to be executed by specific bundle and\or view mode fo entity. Each value must contain $bundle|$view_mode. You may use * to select all. This parameter is not working without "entity" parameter.
 
 ~~~php
 /**
  * Implements hook_jsld_info().
  */
-function MYMODULE_jsld_info() {
-  // Without any additional data, this callback will be called on every page
-  // load during preprocessing html. You can access $variables data from argument.
-  $items['news'] = array(
-    'callback' => 'MYMODULE_jsld_news',
+function hook_jsld_info() {
+  $items['example1'] = array(
+    'callback' => 'mymodule_jsld_example1',
   );
 
-  return $items;
-}
+  $items['example2'] = array(
+    'callback' => 'mymodule_jsld_example2',
+    'file' => 'mymodule.example2.inc',
+  );
 
-/**
- * Json-LD definition for news.
- */
-function MYMODULE_jsld_news(&$vars) {
-  $result = array();
-  if ($node = menu_get_object() && $node->type == 'news') {
-    $result[] = array(
-      '@context' => 'http://schema.org',
-      '@type' => 'NewsArticle',
-      'dateCreated' => date('c', $node->created),
-      'dateModified' =>  date('c', $node->changed),
-    );
-  }
+  $items['example3'] = array(
+    'callback' => 'mymodule_jsld_example3',
+    'file' => 'mymodule_example3.inc',
+    'path' => drupal_get_path('module', 'MYMODULE') . "/includes/jsld",
+  );
 
-  return $result;
-}
-~~~
-
-This simple code define 'news' info hook for current module with callback function 'MYMODULE_jsld_news' which will be called during page generation. Here you can add all JSON-LD information what you want.
-
-~~~php
-/**
- * Implements hook_jsld_info().
- */
-function MYMODULE_jsld_info() {
-  // This hook will be called only for entity type of node during entity view
-  // preparation. It's called on every page where this entity appears.
-  $items['news'] = array(
-    'callback' => 'MYMODULE_jsld_news',
+  $items['example4'] = array(
+    'callback' => 'mymodule_jsld_example3',
     'entity' => 'node',
   );
 
-  return $items;
-}
-
-function MYMODULE_jsld_news($jsld) {}
-~~~
-
-~~~php
-/**
- * Implements hook_jsld_info().
- */
-function MYMODULE_jsld_info() {
-  // This hook will be called only for entity type of node and bundle news.
-  // Also it will be called just for teaser view mode of entity. You
-  // can set multiple variations and user * for wildcard.
-  // F.e. array('news|*', '*|full')
-  $items['news'] = array(
-    'callback' => 'MYMODULE_jsld_news',
+  $items['example5'] = array(
+    'callback' => 'mymodule_jsld_example5',
     'entity' => 'node',
-    'entity_limit' => array('news|teaser'),
+    'entity_limit' => array('news|teaser', 'article|full', 'page|*'),
   );
 
   return $items;
 }
-
-function MYMODULE_jsld_news($jsld) {}
 ~~~
 
-### Tip 1
+### hook_js_info_alter().
 
-You also can define custom file and file path which will be loaded for using. This can help you orginize your code for different files. @see jsld.api.php
-
-### Tip 2
-
-You can create **MYMODULE.jsld.inc** file in the root of your module, and place hooks here. This file will load automatically when it needed.
-
-## Alter info hooks
-
-Provide tools to alter info hooks.
+This hook help you to alter others info hook definitions.
 
 ~~~php
 /**
@@ -103,7 +74,7 @@ function hook_jsld_info_alter(&$info) {
 ~~~
 
 
-## Alter final data.
+### hook_jsld_alter().
 
 This can help you to midfy ready to render data. This  called just before `json_encode` and putting this on page.
 
@@ -116,68 +87,29 @@ function hook_jsld_alter(&$jsld) {
 }
 ~~~
 
-## Add data from anywhere.
+## Functions
+
+### jsld_push_data()
 
 You can easily add data from every place you like. Use `jsld_push_data()` for this.
 
-F.e. add Review schema.org for entity type `node` and bundle `testimonial`.
+## Examples
 
-~~~php
-/**
- * Implements hook_entity_view().
- */
-function germes_entity_view($entity, $type, $view_mode, $langcode) {
-  global $base_url;
+### Example 1 - Schema.org for testimonials
 
-  if ($type == 'node' && $entity->type == 'testimonial') {
-    $wrapper = entity_metadata_wrapper('node', $entity);
-    $nid = $wrapper->getIdentifier();
-    $body = $wrapper->body->value();
-
-    dpm($wrapper->getPropertyInfo());
-    $jsld = array(
-      '@context' => 'http://schema.org',
-      '@type' => 'Review',
-      'author' => array(
-        '@type' => 'Person',
-        'name' => $wrapper->field_testimonial_name->value(),
-      ),
-      'url' => "$base_url/testimonials#testimonial-$nid",
-      'datePublished' => date('c', $entity->created),
-      'description' => $body['safe_value'],
-      'inLanguage' => $langcode,
-      'itemReviewed' => array(
-        '@type' => 'Organization',
-        'name' => variable_get('site_name', ''),
-        'sameAs' => $base_url,
-        'url' => $base_url,
-
-      ),
-      'reviewRating' =>  array(
-        '@type' => 'Rating',
-        'worstRating' => 1,
-        'bestRating' => 5,
-        'ratingValue' => 5,
-      ),
-    );
-
-    // And finally push data.
-    jsld_push_data($jsld);
-  }
-}
-~~~
-
-The same code above but using hook.
+* Entity type: `node`
+* Machine name of bundle: `testimonial`
 
 ~~~php
 /**
  * Implements hook_jsld_info().
  */
 function MYMODULE_jsld_info() {
-  $items['testimonial_teaser'] = array(
-    'callback' => 'MYMODULE_jsld_testimonial_teaser',
+  $items['testimonials'] = array(
+    'callback' => 'MYMODULE_jsld_testimonials',
     'entity' => 'node',
-    'entity_limit' => array('testimonial|teaser'),
+    // We need this schema for all view modes of testimonials.
+    'entity_limit' => array('testimonial|*'),
   );
 
   return $items;
@@ -186,9 +118,9 @@ function MYMODULE_jsld_info() {
 /**
  * Testimonial teaser.
  */
-function MYMODULE_jsld_testimonial_teaser($jsld) {
+function MYMODULE_jsld_testimonials($entity_info) {
   global $base_url;
-  $wrapper = entity_metadata_wrapper('node', $jsld['entity']);
+  $wrapper = entity_metadata_wrapper('node', $entity_info['entity']);
   $nid = $wrapper->getIdentifier();
   $body = $wrapper->body->value();
 
@@ -202,7 +134,7 @@ function MYMODULE_jsld_testimonial_teaser($jsld) {
     'url' => "$base_url/testimonials#testimonial-$nid",
     'datePublished' => date('c', $wrapper->created->value()),
     'description' => $body['safe_value'],
-    'inLanguage' => $jsld['langcode'],
+    'inLanguage' => $entity_info['langcode'],
     'itemReviewed' => array(
       '@type' => 'Organization',
       'name' => variable_get('site_name', ''),

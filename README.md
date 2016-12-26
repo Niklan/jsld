@@ -190,6 +190,7 @@ function MYMODULE_jsld_testimonials($entity_info) {
     'name' => $wrapper->label(),
     'description' => strip_tags($description['safe_value']),
     'image' => $photo,
+    'sku' => $wrapper->field_products[0]->sku->value(),
     'offers' => array(
       '@type' => 'Offer',
       'priceCurrency' => $price['currency_code'],

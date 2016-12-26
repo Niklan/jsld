@@ -9,19 +9,30 @@
  * Implements hook_jsld_info().
  */
 function hook_jsld_info() {
-  $items['news'] = array(
-    'callback' => 'mymodule_jsld_news',
+  $items['example1'] = array(
+    'callback' => 'mymodule_jsld_example1',
   );
 
-  $items['article'] = array(
-    'callback' => 'mymodule_jsld_article',
-    'file' => 'mymodule.jsld.inc',
+  $items['example2'] = array(
+    'callback' => 'mymodule_jsld_example2',
+    'file' => 'mymodule.example2.inc',
   );
 
-  $items['contact'] = array(
-    'callback' => 'mymodule_jsld_contact',
-    'file' => 'mymodule_contact.inc',
-    'path' => drupal_get_path('module', 'jslc') . "/includes/jsld",
+  $items['example3'] = array(
+    'callback' => 'mymodule_jsld_example3',
+    'file' => 'mymodule_example3.inc',
+    'path' => drupal_get_path('module', 'MYMODULE') . "/includes/jsld",
+  );
+
+  $items['example4'] = array(
+    'callback' => 'mymodule_jsld_example3',
+    'entity' => 'node',
+  );
+
+  $items['example5'] = array(
+    'callback' => 'mymodule_jsld_example5',
+    'entity' => 'node',
+    'entity_limit' => array('news|teaser', 'article|full', 'page|*'),
   );
 
   return $items;

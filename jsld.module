@@ -50,9 +50,9 @@ function jsld_info() {
 }
 
 /**
- * Implements hook_preprocess_html().
+ * Implements hook_process_html().
  */
-function jsld_preprocess_html(&$variables) {
+function jsld_process_html(&$variables) {
   global $jsld;
   $hooks_info = jsld_info();
 
@@ -73,12 +73,14 @@ function jsld_preprocess_html(&$variables) {
   drupal_alter('jsld', $jsld);
 
   if (!empty($jsld)) {
-    $script = array(
+    $jsld_tag = array(
+      '#type' => 'html_tag',
       '#tag' => 'script',
       '#attributes' => array('type' => 'application/ld+json'),
       '#value' => json_encode($jsld),
     );
-    drupal_add_html_head($script, 'json-ld');
+
+    $variables['page_bottom'] .= drupal_render($jsld_tag);
   }
 }
 

@@ -21,7 +21,7 @@ function hook_jsld_info() {
   $items['example3'] = array(
     'callback' => 'mymodule_jsld_example3',
     'file' => 'mymodule_example3.inc',
-    'path' => drupal_get_path('module', 'MYMODULE') . "/includes/jsld",
+    'file_path' => drupal_get_path('module', 'MYMODULE') . "/includes/jsld",
   );
 
   $items['example4'] = array(
@@ -33,6 +33,18 @@ function hook_jsld_info() {
     'callback' => 'mymodule_jsld_example5',
     'entity' => 'node',
     'entity_limit' => array('news|teaser', 'article|full', 'page|*'),
+  );
+
+  $items['example6'] = array(
+    'callback' => 'mymodule_jsld_example6',
+    'match_path' => array('<front>', 'about', 'about/*'),
+  );
+
+  $items['example7'] = array(
+    'callback' => 'mymodule_jsld_example7',
+    // All except frontpage.
+    'match_path' => array('<front>'),
+    'match_type' => JSLD_MATCH_TYPE_UNLISTED,
   );
 
   return $items;

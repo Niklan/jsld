@@ -21,9 +21,11 @@ An associative array of jsld callbacks. They key is name for callback, nothing e
 
 * **'callback'**: _(required)_ A function name which will be called.
 * **'file'**: _(optional)_ A file that will be included before callback is called.
-* **'path'**: _(optional)_ The path to directory containing the file from "file" parameter above. By default uses root of the module implementing the hook.
+* **'file_path'**: _(optional)_ The path to directory containing the file from "file" parameter above. By default uses root of the module implementing the hook.
 * **'entity'**: _(optional)_ An entity machine name to which you can attach callback. If you fill this, callback will be called only when on page rendered one or more entity of this type. When you set this, all information about entity will be passed to first argument.
 * **'entity_limit'**: _(optional)_ An array with limitation for entity. You can limit callback to be executed by specific bundle and\or view mode fo entity. Each value must contain $bundle|$view_mode. You may use * to select all. This parameter is not working without "entity" parameter.
+* **'match_path'**: _(optional)_ An array with limitation for paths. You can set the where this callback will be called. Also this parameter respect entity limitation parameters, so you can limit by entity, bundle, view_mode and path together. You can use default drupal placeholders, like `<front>`, `*` and so on.
+* **'match_type'**: _(optional)_ Define how match path will be used. `JSLD_MATCH_TYPE_LISTED` (default) - only on "match_path" which listed in array, `JSLD_MATCH_TYPE_UNLISTED` - for all pages which is not match to defined in "match_path".
 
 ~~~php
 /**
@@ -42,7 +44,7 @@ function hook_jsld_info() {
   $items['example3'] = array(
     'callback' => 'mymodule_jsld_example3',
     'file' => 'mymodule_example3.inc',
-    'path' => drupal_get_path('module', 'MYMODULE') . "/includes/jsld",
+    'file_path' => drupal_get_path('module', 'MYMODULE') . "/includes/jsld",
   );
 
   $items['example4'] = array(
@@ -55,6 +57,18 @@ function hook_jsld_info() {
     'entity' => 'node',
     'entity_limit' => array('news|teaser', 'article|full', 'page|*'),
   );
+  
+  $items['example6'] = array(
+    'callback' => 'mymodule_jsld_example6',
+    'match_path' => array('<front>', 'about', 'about/*'),
+  );
+  
+  $items['example7'] = array(
+      'callback' => 'mymodule_jsld_example7',
+      // All except frontpage.
+      'match_path' => array('<front>'),
+      'match_type' => JSLD_MATCH_TYPE_UNLISTED,
+    );
 
   return $items;
 }
@@ -69,7 +83,7 @@ This hook help you to alter others info hook definitions.
  * Implements hook_js_info_alter().
  */
 function hook_jsld_info_alter(&$info) {
-  $info['mymodule']['article']['path'] = drupal_get_path('module', 'jslc') . "/includes/jsld";
+  $info['mymodule']['article']['file_path'] = drupal_get_path('module', 'jslc') . "/includes/jsld";
 }
 ~~~
 

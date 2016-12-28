@@ -5,6 +5,9 @@
  *   Main file for hooks.
  */
 
+define('JSLD_MATCH_TYPE_LISTED', 1);
+define('JSLD_MATCH_TYPE_UNLISTED', 2);
+
 /**
  * Implements hook_hook_info().
  */
@@ -33,8 +36,8 @@ function jsld_info() {
         if (isset($hook_info['file'])) {
           $filename = $hook_info['file'];
 
-          if (isset($hook_info['path'])) {
-            require_once DRUPAL_ROOT . '/' . $hook_info['path'] . "/$filename";
+          if (isset($hook_info['file_path'])) {
+            require_once DRUPAL_ROOT . '/' . $hook_info['file_path'] . "/$filename";
           }
           else {
             require_once DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . "/$filename";
@@ -62,7 +65,14 @@ function jsld_process_html(&$variables) {
       // by hook_entity_view.
       if (function_exists($hook_data['callback']) && !isset($hook_data['entity'])) {
         $function = $hook_data['callback'];
-        $result = $function($variables);
+        if (!isset($hook_data['match_path'])) {
+          $result = $function($variables);
+        }
+        elseif (isset($hook_data['match_path']) && jsld_match_path($hook_data['match_path'])) {
+          // When match paths is set and match to current path.
+          $result = $function($variables);
+        }
+
         if (!empty($result)) {
           jsld_push_data($result);
         }
@@ -151,7 +161,13 @@ function jsld_entity_view($entity, $type, $view_mode, $langcode) {
         if (isset($hook_data['entity_limit']) && jsld_entity_limit($bundle, $view_mode, $hook_data['entity_limit'])) {
           if (function_exists($hook_data['callback'])) {
             $function = $hook_data['callback'];
-            $result = $function($entity_info);
+            if (!isset($hook_data['match_path'])) {
+              $result = $function($entity_info);
+            }
+            elseif (isset($hook_data['match_path']) && jsld_match_path($hook_data['match_path'])) {
+              // When match paths is set and match to current path.
+              $result = $function($entity_info);
+            }
             if (!empty($result)) {
               jsld_push_data($result);
             }
@@ -163,7 +179,13 @@ function jsld_entity_view($entity, $type, $view_mode, $langcode) {
           // not passed.
           if (function_exists($hook_data['callback'])) {
             $function = $hook_data['callback'];
-            $result = $function($entity_info);
+            if (!isset($hook_data['match_path'])) {
+              $result = $function($entity_info);
+            }
+            elseif (isset($hook_data['match_path']) && jsld_match_path($hook_data['match_path'])) {
+              // When match paths is set and match to current path.
+              $result = $function($entity_info);
+            }
             if (!empty($result)) {
               jsld_push_data($result);
             }
@@ -172,4 +194,15 @@ function jsld_entity_view($entity, $type, $view_mode, $langcode) {
       }
     }
   }
+}
+
+/**
+ * Trying to find, match current path to provided patterns or not.
+ */
+function jsld_match_path(array $patterns, $type = JSLD_MATCH_TYPE_LISTED) {
+  $patterns_string = drupal_strtolower(implode(PHP_EOL, $patterns));
+  $current_path_alias = drupal_strtolower(drupal_get_path_alias(current_path()));
+  $current_path = drupal_strtolower(current_path());
+  $result = drupal_match_path($current_path, $patterns_string) || drupal_match_path($current_path_alias, $patterns_string);
+  return $type === JSLD_MATCH_TYPE_LISTED ? $result : !$result;
 }

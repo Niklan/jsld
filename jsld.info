@@ -1,6 +1,0 @@
-name = Json-LD
-description = API for add JSON LD support to your site.
-core = 7.x
-version = 7.x
-
-dependencies[] = entity

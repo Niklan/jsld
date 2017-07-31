@@ -9,89 +9,10 @@ define('JSLD_MATCH_TYPE_LISTED', 1);
 define('JSLD_MATCH_TYPE_UNLISTED', 2);
 
 /**
- * Implements hook_hook_info().
- */
-function jsld_hook_info() {
-  $hooks['jsld_info'] = array(
-    'group' => 'jsld',
-  );
-
-  return $hooks;
-}
-
-/**
- * All information about hooks.
- *
- * @return array|mixed
- */
-function jsld_info() {
-  $result = &drupal_static(__FUNCTION__);
-  if (!isset($data)) {
-    $result = array();
-    foreach (module_implements('jsld_info') as $module) {
-      $result[$module] = module_invoke($module, 'jsld_info');
-
-      // Load files which declared in hook.
-      foreach ($result[$module] as $hook_info) {
-        if (isset($hook_info['file'])) {
-          $filename = $hook_info['file'];
-
-          if (isset($hook_info['file_path'])) {
-            require_once DRUPAL_ROOT . '/' . $hook_info['file_path'] . "/$filename";
-          }
-          else {
-            require_once DRUPAL_ROOT . '/' . drupal_get_path('module', $module) . "/$filename";
-          }
-        }
-      }
-    }
-  }
-
-  drupal_alter('jsld_info', $result);
-
-  return $result;
-}
-
-/**
  * Implements hook_process_html().
  */
 function jsld_process_html(&$variables) {
-  global $jsld;
-  $hooks_info = jsld_info();
 
-  foreach ($hooks_info as $module => $hooks) {
-    foreach ($hooks as $hook_name => $hook_data) {
-      // If entity is set, we don't need to go further. This will be handled
-      // by hook_entity_view.
-      if (function_exists($hook_data['callback']) && !isset($hook_data['entity'])) {
-        $function = $hook_data['callback'];
-        if (!isset($hook_data['match_path'])) {
-          $result = $function($variables);
-        }
-        elseif (isset($hook_data['match_path']) && jsld_match_path($hook_data['match_path'])) {
-          // When match paths is set and match to current path.
-          $result = $function($variables);
-        }
-
-        if (!empty($result)) {
-          jsld_push_data($result);
-        }
-      }
-    }
-  }
-
-  drupal_alter('jsld', $jsld);
-
-  if (!empty($jsld)) {
-    $jsld_tag = array(
-      '#type' => 'html_tag',
-      '#tag' => 'script',
-      '#attributes' => array('type' => 'application/ld+json'),
-      '#value' => json_encode($jsld),
-    );
-
-    $variables['page_bottom'] .= drupal_render($jsld_tag);
-  }
 }
 
 /**
@@ -107,9 +28,6 @@ function jsld_boot() {
  *
  * @param array $data
  *   Array with Json-LD data structure.
- *
- * @todo
- *   Maybe add $key parameter for avoid duplicates if they appear in time.
  */
 function jsld_push_data($data = array()) {
   global $jsld;
@@ -117,92 +35,10 @@ function jsld_push_data($data = array()) {
 }
 
 /**
- * Check limitation for bundle and view mode of entity.
+ * Implements hook_preprocess_HOOK().
  */
-function jsld_entity_limit($bundle, $view_mode, $limits = array()) {
-  $valid = FALSE;
-  foreach ($limits as $limit) {
-    // Every limit must contain separator.
-    if (strpos($limit, '|') === FALSE) {
-      continue;
-    }
-
-    list($limit_bundle, $limit_view_mode) = explode('|', $limit);
-    if (($bundle == $limit_bundle || $limit_bundle == '*') && ($view_mode == $limit_view_mode || $limit_view_mode == '*')) {
-      $valid = TRUE;
-      break;
-    }
-  }
-
-  return $valid;
-}
-
-/**
- * Implements hook_entity_view().
- */
-function jsld_entity_view($entity, $type, $view_mode, $langcode) {
-  $wrapper = entity_metadata_wrapper($type, $entity);
-  $bundle = $wrapper->getBundle();
-  $hooks_info = jsld_info();
-  $entity_info = array(
-    'entity' => $entity,
-    'bundle' => $bundle,
-    'type' => $type,
-    'view_mode' => $view_mode,
-    'langcode' => $langcode,
-  );
-
-  // Looking for hooks with 'entity' value.
-  foreach ($hooks_info as $module => $hooks) {
-    foreach ($hooks as $hook_name => $hook_data) {
-      if (isset($hook_data['entity']) && $hook_data['entity'] == $type) {
-        // If entity limit is set, we must check it. If it valid - we will call
-        // callback.
-        if (isset($hook_data['entity_limit']) && jsld_entity_limit($bundle, $view_mode, $hook_data['entity_limit'])) {
-          if (function_exists($hook_data['callback'])) {
-            $function = $hook_data['callback'];
-            if (!isset($hook_data['match_path'])) {
-              $result = $function($entity_info);
-            }
-            elseif (isset($hook_data['match_path']) && jsld_match_path($hook_data['match_path'])) {
-              // When match paths is set and match to current path.
-              $result = $function($entity_info);
-            }
-            if (!empty($result)) {
-              jsld_push_data($result);
-            }
-          }
-        }
-        elseif (!isset($hook_data['entity_limit'])) {
-          // Here we go only when entity is set, but entity_limit is not. If
-          // entity limit is set it will called from condition above, or not, if
-          // not passed.
-          if (function_exists($hook_data['callback'])) {
-            $function = $hook_data['callback'];
-            if (!isset($hook_data['match_path'])) {
-              $result = $function($entity_info);
-            }
-            elseif (isset($hook_data['match_path']) && jsld_match_path($hook_data['match_path'])) {
-              // When match paths is set and match to current path.
-              $result = $function($entity_info);
-            }
-            if (!empty($result)) {
-              jsld_push_data($result);
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-/**
- * Trying to find, match current path to provided patterns or not.
- */
-function jsld_match_path(array $patterns, $type = JSLD_MATCH_TYPE_LISTED) {
-  $patterns_string = drupal_strtolower(implode(PHP_EOL, $patterns));
-  $current_path_alias = drupal_strtolower(drupal_get_path_alias(current_path()));
-  $current_path = drupal_strtolower(current_path());
-  $result = drupal_match_path($current_path, $patterns_string) || drupal_match_path($current_path_alias, $patterns_string);
-  return $type === JSLD_MATCH_TYPE_LISTED ? $result : !$result;
+function jsld_preprocess_page(&$variables) {
+  $plugin_service = \Drupal::service('plugin.manager.jsld.entity');
+  $plugin_definitions = $plugin_service->getDefinitions();
+  ksm($plugin_definitions);
 }

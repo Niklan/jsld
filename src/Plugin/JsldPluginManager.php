@@ -32,9 +32,7 @@ class JsldPluginManager extends DefaultPluginManager {
     parent::__construct("Plugin/jsld/$type", $namespaces, $module_handler, 'Drupal\jsld\Plugin\jsld\JsldPluginInterface', $plugin_definition_annotation_name);
 
     $this->defaults += [
-      'parent' => 'parent',
       'plugin_type' => $type,
-      'register_theme' => TRUE,
     ];
 
     $this->alterInfo('jsld_plugins_' . $type);

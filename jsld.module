@@ -8,28 +8,16 @@
 define('JSLD_MATCH_TYPE_LISTED', 1);
 define('JSLD_MATCH_TYPE_UNLISTED', 2);
 
-/**
- * Implements hook_process_html().
- */
-function jsld_process_html(&$variables) {
-
-}
-
-/**
- * Implements hook_boot().
- */
-function jsld_boot() {
-  global $jsld;
-  $jsld = array();
-}
 
 /**
  * Add data to current.
  *
+ * @todo move to helper.
+ * 
  * @param array $data
  *   Array with Json-LD data structure.
  */
-function jsld_push_data($data = array()) {
+function jsld_push_data($data = []) {
   global $jsld;
   $jsld[] = $data;
 }
@@ -39,6 +27,8 @@ function jsld_push_data($data = array()) {
  */
 function jsld_preprocess_page(&$variables) {
   $plugin_service = \Drupal::service('plugin.manager.jsld.entity');
-  $plugin_definitions = $plugin_service->getDefinitions();
-  ksm($plugin_definitions);
+  foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
+    $instance = $plugin_service->createInstance($plugin_id);
+    // @TODO.
+  }
 }

@@ -5,3 +5,9 @@ services:
   plugin.manager.jsld.path:
     class: Drupal\jsld\Plugin\JsldPluginManager
     arguments: [path, '@container.namespaces', '@cache.discovery', '@module_handler']
+  event.subscruber.jsld:
+    class: Drupal\jsld\EventSubscriber\JsldSubscriber
+    tags:
+      - {name: event_subscriber}
+  jsld.helper:
+    class: Drupal\jsld\JsldHelper

@@ -1,11 +1,13 @@
 <?php
 
-namespace Drupal\jsld;
+namespace Drupal\jsld\Service;
 
 /**
  * {@inheritdoc}
+ *
+ * @todo maybe refactor it to JsldGlobal.
  */
-class JsldHelper {
+class JsldGlobal {
 
   /**
    * {@inheritdoc}
@@ -34,8 +36,17 @@ class JsldHelper {
    *
    * @return array
    */
-  public function getJsld() {
+  public function get() {
     return $this->jsld;
+  }
+
+  /**
+   * Add array to global $jsld.
+   *
+   * @return array
+   */
+  public function add($element = []) {
+    $this->jsld[] = $element;
   }
 
 }

@@ -25,7 +25,7 @@ class JsldEntity extends Plugin {
    *
    * @see $type.
    */
-  public $entity;
+  public $entity_type;
 
   /**
    * Entity limitations. If set entity type, this option can help to restrict

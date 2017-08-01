@@ -27,49 +27,19 @@ abstract class JsldPluginBase extends PluginBase implements JsldPluginInterface 
    * {@inheritdoc}
    */
   public function isEnabled() {
-    return $this->pluginDefinition['enabled'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getType() {
-    return $this->pluginDefinition['type'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEntity() {
-    return $this->pluginDefinition['entity'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getEntityLimit() {
-    return $this->pluginDefinition['entity_limit'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMatchPath() {
-    return $this->pluginDefinition['match_path'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMatchType() {
-    return $this->pluginDefinition['match_type'];
+    if (isset($this->pluginDefinition['enabled'])) {
+      return $this->pluginDefinition['enabled'];
+    }
+    else {
+      return TRUE;
+    }
   }
 
   /**
    * @return array
    *   The JsonLD array.
    */
-  public function jsld() {
+  public function build() {
     return [];
   }
 

@@ -12,7 +12,7 @@ class JsldSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    */
   public function jsldInit(GetResponseEvent $event) {
-    \Drupal::service('jsld.helper')->init();
+    \Drupal::service('jsld.global')->init();
   }
 
   /**

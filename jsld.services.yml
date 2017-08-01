@@ -9,5 +9,5 @@ services:
     class: Drupal\jsld\EventSubscriber\JsldSubscriber
     tags:
       - {name: event_subscriber}
-  jsld.helper:
-    class: Drupal\jsld\JsldHelper
+  jsld.global:
+    class: Drupal\jsld\Service\JsldGlobal

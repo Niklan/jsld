@@ -65,4 +65,17 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
     return $this->configuration['view_mode'];
   }
 
+  /**
+   * @return bool
+   *   The stat of plugin, enabled or disabled.
+   */
+  public function isEnabled() {
+    if (isset($this->pluginDefinition['enabled'])) {
+      return $this->pluginDefinition['enabled'];
+    }
+    else {
+      return TRUE;
+    }
+  }
+
 }

@@ -24,7 +24,7 @@ class JsldPath extends Plugin {
    * Array with paths to limit execution. Works with "match_type" and depends on
    * it's value. Can contain wildcard ("*") and Drupal placeholders ("<front>").
    */
-  public $math_path;
+  public $match_path;
 
   /**
    * Match type for "path" type plugin restriction.

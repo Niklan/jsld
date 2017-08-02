@@ -11,20 +11,22 @@ use Psy\Util\Json;
  * Implements hook_entity_view().
  */
 function jsld_entity_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
-  $entity_type = $build['#entity_type'];
-  $plugin_service = \Drupal::service('plugin.manager.jsld.entity');
-  foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
-    if ($plugin['plugin_type'] == 'entity' && $plugin['entity_type'] == $entity_type && jsld_entity_limit($entity->bundle(), $view_mode, $plugin['entity_limit'])) {
-      $instance = $plugin_service->createInstance($plugin_id, [
-        'entity' => $entity,
-        'entity_type' => $entity_type,
-        'bundle' => $entity->bundle(),
-        'view_mode' => $view_mode,
-      ]);
+  if (!empty($build['#entity_type'])) {
+    $entity_type = $build['#entity_type'];
+    $plugin_service = \Drupal::service('plugin.manager.jsld.entity');
+    foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
+      if ($plugin['entity_type'] == $entity_type && jsld_entity_limit($entity->bundle(), $view_mode, $plugin['entity_limit'])) {
+        $instance = $plugin_service->createInstance($plugin_id, [
+          'entity' => $entity,
+          'entity_type' => $entity_type,
+          'bundle' => $entity->bundle(),
+          'view_mode' => $view_mode,
+        ]);
 
-      if ($instance->isEnabled()) {
-        $jsld_global = \Drupal::service('jsld.global');
-        $jsld_global->add($instance->build());
+        if ($instance->isEnabled()) {
+          $jsld_global = \Drupal::service('jsld.global');
+          $jsld_global->add($instance->build());
+        }
       }
     }
   }
@@ -56,6 +58,25 @@ function jsld_entity_limit($bundle, $view_mode, $limits = []) {
  */
 function jsld_preprocess_html(&$variables) {
   $jsld_global = \Drupal::service('jsld.global');
+  // Path plugins.
+  $plugin_service = \Drupal::service('plugin.manager.jsld.path');
+  $path_matcher = \Drupal::service('path.matcher');
+  $request = \Drupal::request();
+  $current_path = \Drupal::service('path.current')->getPath();
+  foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
+    $pattern = implode(PHP_EOL, $plugin['match_path']);
+    $is_match_path = $path_matcher->matchPath($current_path, $pattern);
+    $is_need_jsld = ($is_match_path xor $plugin['match_type']);
+    if ($is_need_jsld) {
+      $instance = $plugin_service->createInstance($plugin_id, [
+        'request' => $request,
+      ]);
+
+      if ($instance->isEnabled()) {
+        $jsld_global->add($instance->build());
+      }
+    }
+  }
   $jsld = $jsld_global->get();
   if (!empty($jsld)) {
     $variables['page_bottom'][] = [

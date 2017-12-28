@@ -13,6 +13,18 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
   public $entity;
 
   /**
+   * JsldEntityPluginBase constructor.
+   *
+   * @param array $configuration
+   * @param $plugin_id
+   * @param $plugin_definition
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->entity = $this->configuration['entity'];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function build() {

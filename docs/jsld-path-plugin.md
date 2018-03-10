@@ -40,7 +40,7 @@ use Drupal\jsld\Plugin\jsld\JsldPathPluginBase;
 /**
  * @JsldPath(
  *   id = "organization",
- *   match_type = "0",
+ *   match_type = "listed",
  *   match_path = {"*"}
  * )
  */

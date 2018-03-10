@@ -1,0 +1,35 @@
+<?php
+
+namespace Drupal\{{ machine_name }}\Plugin\jsld\entity;
+
+use Drupal\jsld\Plugin\jsld\JsldEntityPluginBase;
+
+/**
+ * @JsldEntity(
+ *   id = "{{ plugin_id }}",
+ *   entity_type = "{{ entity_type }}",
+ *   entity_limit = {"bundle|view_mode"}
+ * )
+ */
+class {{ name }} extends JsldEntityPluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build() {
+    $date_formatter = \Drupal::service('date.formatter');
+    $result = [
+      '@context' => 'http://schema.org',
+      '@type' => 'Article',
+      'name' => $this->entity->label(),
+      'headline' => $this->entity->label(),
+      'url' => $this->entity->toUrl('canonical', ['absolute' => TRUE]),
+      'mainEntityOfPage' => $this->entity->toUrl('canonical', ['absolute' => TRUE]),
+      'datePublished' => $date_formatter->format($this->entity->created->value),
+      'dateModified' => $date_formatter->format($this->entity->changed->value),
+    ];
+
+    return $result;
+  }
+
+}

@@ -10,12 +10,12 @@ abstract class JsldPathPluginBase extends JsldPluginBase implements JsldPluginIn
   /**
    * Match passed paths.
    */
-  const MATCH_TYPE_LISTED = 0;
+  const MATCH_TYPE_LISTED = 'listed';
 
   /**
    * Shows only if path not in match path.
    */
-  const MATCH_TYPE_UNLISTED = 1;
+  const MATCH_TYPE_UNLISTED = 'unlisted';
 
   /**
    * @var

@@ -5,6 +5,7 @@
  *   Main file for hooks.
  */
 
+use Drupal\jsld\Plugin\jsld\JsldPathPluginBase;
 use Psy\Util\Json;
 
 /**
@@ -66,7 +67,17 @@ function jsld_preprocess_html(&$variables) {
   foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
     $pattern = implode(PHP_EOL, $plugin['match_path']);
     $is_match_path = $path_matcher->matchPath($current_path, $pattern);
-    $is_need_jsld = ($is_match_path xor $plugin['match_type']);
+    switch ($plugin['match_type']) {
+      case JsldPathPluginBase::MATCH_TYPE_LISTED:
+      default:
+        $match_type = 0;
+        break;
+
+      case JsldPathPluginBase::MATCH_TYPE_UNLISTED:
+        $match_type = 1;
+        break;
+    }
+    $is_need_jsld = ($is_match_path xor $match_type);
     if ($is_need_jsld) {
       $instance = $plugin_service->createInstance($plugin_id, [
         'request' => $request,

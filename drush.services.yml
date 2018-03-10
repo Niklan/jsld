@@ -1,0 +1,9 @@
+services:
+  jsld.generator.entity:
+    class: Drupal\jsld\Generator\JsldEntityPluginGenerator
+    tags:
+      - { name: drush.generator }
+  jsld.generator.path:
+    class: Drupal\jsld\Generator\JsldPathPluginGenerator
+    tags:
+      - { name: drush.generator }

@@ -25,7 +25,7 @@ This plugins is stored in `/src/Plugin/jsld/entity/` path.
 ## Generate plugin
 
 ```sh
-drush generate jsld-entity
+drush generate plugin-jsld-entity
 ```
 
 ## Example of plugin

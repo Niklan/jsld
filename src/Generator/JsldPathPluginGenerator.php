@@ -16,7 +16,7 @@ use Symfony\Component\Console\Question\Question;
  */
 class JsldPathPluginGenerator extends BaseGenerator {
 
-  protected $name = 'jsld-path';
+  protected $name = 'plugin-jsld-path';
 
   protected $description = 'Generates Json-LD plugin for paths.';
 

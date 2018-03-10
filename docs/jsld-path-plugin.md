@@ -25,7 +25,7 @@ This plugins is stored in `/src/Plugin/jsld/path/` path.
 ## Generate plugin
 
 ```sh
-drush generate jsld-path
+drush generate plugin-jsld-path
 ```
 
 ## Example of plugin

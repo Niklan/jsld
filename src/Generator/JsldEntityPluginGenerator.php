@@ -15,7 +15,7 @@ use Symfony\Component\Console\Question\Question;
  */
 class JsldEntityPluginGenerator extends BaseGenerator {
 
-  protected $name = 'jsld-entity';
+  protected $name = 'plugin-jsld-entity';
 
   protected $description = 'Generates Json-LD plugin for entity.';
 

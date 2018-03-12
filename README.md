@@ -1,6 +1,4 @@
-# JSLD module for Drupal
-
-<a href="http://jsld.readthedocs.io"><img src="https://readthedocs.org/projects/jsld/badge/?version=8.x"></a>
+# JSLD module for Drupal [![Documentation Status](https://readthedocs.org/projects/jsld/badge/?version=8.x-1.x)](http://jsld.readthedocs.io)
 
 JSLD is simple API for add Json-LD support to your site.
 

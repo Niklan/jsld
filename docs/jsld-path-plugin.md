@@ -11,14 +11,14 @@ It's used when you need to add JSON-LD on pages with specific paths.
  * @JsldPath(
  *   id = "organization",
  *   match_type = "listed",
- *   match_path = {"*"}
+ *   match_path = {"/about", "<front>", "/info", "/info/*"}
  * )
  */
 ```
 
 - id: Machine name for plugin.
 - match_Type: (listed, unlisted) The way how paths logic will be used. If set to listed, than this JSON-LD will be applied only on listed pages from `match_path`, for unlisted otherwise, on all pages, except listed.
-- match_path: An array of paths. Supports for wildcard `*`. If you set `*`, that plugin will be attached to all pages. Paths must have leading `/`.
+- match_path: An array of paths. Supports for wildcard `*` and `<front>`. If you set `*`, that plugin will be attached to all pages. Paths must have leading `/`.
 
 This plugins is stored in `/src/Plugin/jsld/path/` path.
 

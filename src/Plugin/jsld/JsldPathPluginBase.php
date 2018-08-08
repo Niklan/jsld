@@ -18,11 +18,6 @@ abstract class JsldPathPluginBase extends JsldPluginBase implements JsldPluginIn
   const MATCH_TYPE_UNLISTED = 'unlisted';
 
   /**
-   * @var
-   */
-  public $entity;
-
-  /**
    * {@inheritdoc}
    */
   public function build() {
@@ -37,18 +32,7 @@ abstract class JsldPathPluginBase extends JsldPluginBase implements JsldPluginIn
   }
 
   /**
-   * Gets the current entity.
-   *
-   * @return \Symfony\Component\HttpFoundation\Request
-   *   The currently active request object.
-   */
-  public function request() {
-    return $this->configuration['request'];
-  }
-
-  /**
-   * @return bool
-   *   The stat of plugin, enabled or disabled.
+   * {@inheritdoc}
    */
   public function isEnabled() {
     if (isset($this->pluginDefinition['enabled'])) {

@@ -10,11 +10,13 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 interface JsldPluginInterface extends PluginInspectionInterface {
 
   /**
-   * {@inheritdoc}
+   * Return plugin ID.
    */
   public function getId();
 
   /**
+   * Plugin status.
+   *
    * @return bool
    *   Plugin status. By default all plugin are enabled, but some can be
    *   disabled for many reasons.
@@ -22,9 +24,19 @@ interface JsldPluginInterface extends PluginInspectionInterface {
   public function isEnabled();
 
   /**
+   * Build result array with structured data.
+   *
    * @return array
-   *   The JSON-LD array.
+   *   An array with JSON-LD structured data.
    */
   public function build();
+
+  /**
+   * Returns array with configurations.
+   *
+   * @return array
+   *   An array with plugin configs.
+   */
+  public function getConfiguration();
 
 }

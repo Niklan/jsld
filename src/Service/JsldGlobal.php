@@ -3,9 +3,7 @@
 namespace Drupal\jsld\Service;
 
 /**
- * {@inheritdoc}
- *
- * @todo maybe refactor it to JsldGlobal.
+ * Service to collect all data during request.
  */
 class JsldGlobal {
 
@@ -18,14 +16,14 @@ class JsldGlobal {
    * JsldHelper constructor.
    */
   public function __construct() {
-    global $jsld;
-    $this->jsld = $jsld;
+    global $_jsld_data;
+    $this->jsld = $_jsld_data;
   }
 
   /**
    * Used for initialization of global $jsld variable.
    *
-   * @see \Drupal\jsld\EventSubscriber\JsldSubscriber::jsldInit().
+   * @see \Drupal\jsld\EventSubscriber\JsldSubscriber::jsldInit()
    */
   public function init() {
     $this->jsld = [];
@@ -35,6 +33,7 @@ class JsldGlobal {
    * Return current value for global $jsld.
    *
    * @return array
+   *   Array with all JSON-LD markup.
    */
   public function get() {
     return $this->jsld;
@@ -43,10 +42,11 @@ class JsldGlobal {
   /**
    * Add array to global $jsld.
    *
-   * @return array
+   * @param array $structured_data
+   *   Adds array with structured data to global JSON-LD array.
    */
-  public function add($element = []) {
-    $this->jsld[] = $element;
+  public function add($structured_data = []) {
+    $this->jsld[] = $structured_data;
   }
 
 }

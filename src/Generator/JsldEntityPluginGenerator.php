@@ -9,16 +9,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
 /**
- * Class JsldEntityPluginGenerator
+ * Class JsldEntityPluginGenerator.
  *
  * @package Drupal\jsld\Generators
  */
 class JsldEntityPluginGenerator extends BaseGenerator {
 
+  /**
+   * {@inheritdoc}
+   */
   protected $name = 'plugin-jsld-entity';
 
-  protected $description = 'Generates Json-LD plugin for entity.';
+  /**
+   * {@inheritdoc}
+   */
+  protected $alias = 'jsld-entity';
 
+  /**
+   * {@inheritdoc}
+   */
+  protected $description = 'Generates JSON-LD base plugin for entity.';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $templatePath = __DIR__;
 
   /**

@@ -3,12 +3,14 @@
 namespace Drupal\jsld\Plugin\jsld;
 
 /**
- * Class JsldEntityPluginBase
+ * Base plugin for entity based structured data.
  */
 abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPluginInterface {
 
   /**
-   * @var
+   * An object of current entity.
+   *
+   * @var \Drupal\Core\Entity\EntityInterface
    */
   public $entity;
 
@@ -16,8 +18,11 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
    * JsldEntityPluginBase constructor.
    *
    * @param array $configuration
-   * @param $plugin_id
-   * @param $plugin_definition
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -39,17 +44,20 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
   }
 
   /**
-   * Gets the current entity.
+   * Return entity object.
    *
    * @return \Drupal\Core\Entity\EntityInterface
-   *   The current entity.
+   *   The current entity object.
    */
   public function entity() {
     return $this->configuration['entity'];
   }
 
   /**
-   * {@inheritdoc}
+   * Return entity type id.
+   *
+   * @return string
+   *   Entity type name or empty string, if some problems happens.
    */
   public function getEntityTypeId() {
     if (isset($this->configuration['entity_type'])) {
@@ -64,22 +72,27 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
   }
 
   /**
-   * {@inheritdoc}
+   * Return bundle context.
+   *
+   * @return string
+   *   Entity bundle name.
    */
   public function bundle() {
     return $this->configuration['bundle'];
   }
 
   /**
-   * {@inheritdoc}
+   * Return view mode context.
+   *
+   * @return string
+   *   View mode of entity requested JSON-LD.
    */
   public function viewMode() {
     return $this->configuration['view_mode'];
   }
 
   /**
-   * @return bool
-   *   The stat of plugin, enabled or disabled.
+   * {@inheritdoc}
    */
   public function isEnabled() {
     if (isset($this->pluginDefinition['enabled'])) {

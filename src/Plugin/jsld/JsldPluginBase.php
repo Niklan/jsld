@@ -3,17 +3,23 @@
 namespace Drupal\jsld\Plugin\jsld;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * {@inheritdoc}
+ * Base plugin for more specific plugin bases.
  */
-abstract class JsldPluginBase extends PluginBase implements JsldPluginInterface {
+abstract class JsldPluginBase extends PluginBase implements JsldPluginInterface, ContainerFactoryPluginInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition
+    );
   }
 
   /**
@@ -36,8 +42,7 @@ abstract class JsldPluginBase extends PluginBase implements JsldPluginInterface 
   }
 
   /**
-   * @return array
-   *   The JsonLD array.
+   * {@inheritdoc}
    */
   public function build() {
     return [];

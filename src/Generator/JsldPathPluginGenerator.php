@@ -10,16 +10,30 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
 /**
- * Class JsldPathPluginGenerator
+ * Class JsldPathPluginGenerator.
  *
  * @package Drupal\jsld\Generators
  */
 class JsldPathPluginGenerator extends BaseGenerator {
 
+  /**
+   * {@inheritdoc}
+   */
   protected $name = 'plugin-jsld-path';
 
-  protected $description = 'Generates Json-LD plugin for paths.';
+  /**
+   * {@inheritdoc}
+   */
+  protected $alias = 'jsld-path';
 
+  /**
+   * {@inheritdoc}
+   */
+  protected $description = 'Generates JSON-LD base plugin for paths.';
+
+  /**
+   * {@inheritdoc}
+   */
   protected $templatePath = __DIR__;
 
   /**

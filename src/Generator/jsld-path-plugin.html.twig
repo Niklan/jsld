@@ -17,13 +17,9 @@ class {{ name }} extends JsldPathPluginBase {
    * {@inheritdoc}
    */
   public function build() {
-    $host = \Drupal::request()->getSchemeAndHttpHost();
     return [
       '@context' => 'http://schema.org',
-      '@type' => 'Organization',
-      'name' => \Drupal::config('system.site')->get('name'),
-      'sameAs' => $host,
-      'url' => $host,
+      '@type' => '',
     ];
   }
 

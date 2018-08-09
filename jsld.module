@@ -87,15 +87,18 @@ function jsld_preprocess_html(&$variables) {
       }
     }
   }
+
   $jsld = $jsld_global->get();
   if (!empty($jsld)) {
-    $variables['page_bottom'][] = [
-      '#type' => 'html_tag',
-      '#tag' => 'script',
-      '#attributes' => [
-        'type' => 'application/ld+json',
-      ],
-      '#value' => Json::encode($jsld),
-    ];
+    foreach ($jsld as $jsld_structured_data) {
+      $variables['page_bottom'][] = [
+        '#type' => 'html_tag',
+        '#tag' => 'script',
+        '#attributes' => [
+          'type' => 'application/ld+json',
+        ],
+        '#value' => Json::encode($jsld_structured_data),
+      ];
+    }
   }
 }

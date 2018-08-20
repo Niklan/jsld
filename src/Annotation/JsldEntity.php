@@ -24,10 +24,10 @@ class JsldEntity extends Plugin {
    * By default all plugins enabled, this is needed when some plugins want's to
    * be disabled for some reasons.
    *
-   * 1 - enabled.
-   * 0 - disabled.
+   * TRUE - enabled.
+   * FALSE - disabled.
    *
-   * @var int
+   * @var bool
    */
   public $enabled;
 

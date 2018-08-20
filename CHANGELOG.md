@@ -8,3 +8,5 @@
 - Removed request() method from JsldPathPlugin, use container injection instead.
 - Improved plugin generators for Drush. Now they with examples of container injection.
 - From now, each structured data from plugin will have personal script tag with data, not all in one place.
+- Refactored Drush generator command `drush generate jsld`.
+- Added predefined examples for common structured data type when using drush generator.

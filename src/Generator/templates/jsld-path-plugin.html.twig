@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Structured data {{ name }}.
+ * Structured data for {{ plugin_label }}.
  *
  * @JsldPath(
  *   id = "{{ plugin_id }}",
@@ -48,10 +48,9 @@ class {{ name }} extends JsldPathPluginBase {
    * {@inheritdoc}
    */
   public function build() {
-    return [
-      '@context' => 'http://schema.org',
-      '@type' => '',
-    ];
+    {% block build %}{% endblock %}
+
+    return $jsld;
   }
 
 }

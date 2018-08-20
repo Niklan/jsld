@@ -7,7 +7,7 @@ use Drupal\jsld\Plugin\jsld\JsldEntityPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Structured data {{ name }}.
+ * Structured data for {{ plugin_label }}.
  *
  * @JsldEntity(
  *   id = "{{ plugin_id }}",
@@ -50,12 +50,9 @@ class {{ name }} extends JsldEntityPluginBase {
   public function build() {
     $entity = $this->entity();
 
-    $result = [
-      '@context' => 'http://schema.org',
-      '@type' => '',
-    ];
+    {% block build %}{% endblock %}
 
-    return $result;
+    return $jsld;
   }
 
 }

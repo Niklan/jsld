@@ -3,8 +3,6 @@
 namespace Drupal\jsld\Generator;
 
 use Drupal\Core\Entity\ContentEntityType;
-use Drupal\Core\Entity\EntityType;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use DrupalCodeGenerator\Command\BaseGenerator;
 use DrupalCodeGenerator\Utils;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,10 +36,6 @@ class JsldComplexPluginGenerator extends BaseGenerator {
    */
   protected $templatePath = __DIR__ . '/templates';
 
-  public function __construct($name = NULL) {
-    parent::__construct($name);
-  }
-
   /**
    * {@inheritdoc}
    */
@@ -69,7 +63,8 @@ class JsldComplexPluginGenerator extends BaseGenerator {
     // Special questions for Entity plugin type.
     if ($vars['jsld_plugin_type'] == 'entity') {
       $entity_types = [];
-      foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type_id => $entity_type) {
+      foreach (\Drupal::entityTypeManager()
+                 ->getDefinitions() as $entity_type_id => $entity_type) {
         if ($entity_type instanceof ContentEntityType) {
           $entity_types[$entity_type_id] = $entity_type->getLabel();
         }

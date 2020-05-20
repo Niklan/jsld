@@ -40,7 +40,7 @@ class JsldComplexPluginGenerator extends BaseGenerator {
    * {@inheritdoc}
    */
   protected function interact(InputInterface $input, OutputInterface $output) {
-    $questions = Utils::defaultPluginQuestions();
+    $questions = Utils::pluginQuestions();
 
     $this->askForStructuredDataType($questions);
     $this->askForPluginType($questions);

@@ -46,7 +46,7 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
   /**
    * Return entity object.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return \Drupal\Core\Entity\EntityInterface|null
    *   The current entity object.
    */
   public function entity() {

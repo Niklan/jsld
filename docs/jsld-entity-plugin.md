@@ -35,9 +35,14 @@ drush generate plugin-jsld-entity
 
 namespace Drupal\MODULENAME\Plugin\jsld\entity;
 
+use Drupal\Core\Config\ImmutableConfig;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\jsld\Plugin\jsld\JsldEntityPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @JsldEntity(
@@ -46,34 +51,60 @@ use Drupal\jsld\Plugin\jsld\JsldEntityPluginBase;
  *   entity_limit = {"news|*"}
  * )
  */
-class NodeNews extends JsldEntityPluginBase {
+class NodeNews extends JsldEntityPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The current request.
+   */
+  protected Request $request;
+
+  /**
+   * The config system site.
+   */
+  protected ImmutableConfig $configSystemSite;
+
+  /**
+   * The date formatter service.
+   */
+  protected ?DateFormatterInterface $dateFormatter;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container,array $configuration,$plugin_id,$plugin_definition){
+    $instance = new static($configuration, $plugin_id, $plugin_definition);
+    $instance->request = $container->get('request_stack')->getCurrentRequest();
+    $instance->configSystemSite = $container->get('config.factory')->get('system.site');
+    $instance->dateFormatter = $container->get('date.formatter');
+
+    return $instance;
+  }
 
   /**
    * {@inheritdoc}
    */
   public function build() {
-    $host = \Drupal::request()->getSchemeAndHttpHost();
-    $date_formatter = \Drupal::service('date.formatter');
+    $host = $this->request->getSchemeAndHttpHost();
     $result = [
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'Article',
       'name' => $this->entity->label(),
       'headline' => $this->entity->label(),
       'url' => $this->entity->toUrl('canonical', ['absolute' => TRUE]),
       'mainEntityOfPage' => $this->entity->toUrl('canonical', ['absolute' => TRUE]),
-      'datePublished' => $date_formatter->format($this->entity->created->value),
-      'dateModified' => $date_formatter->format($this->entity->changed->value),
+      'datePublished' => $this->dateFormatter->format($this->entity->created->value),
+      'dateModified' => $this->dateFormatter->format($this->entity->changed->value),
       'author' => [
-        '@context' => 'http://schema.org',
+        '@context' => 'https://schema.org',
         '@type' => 'Organization',
-        'name' => \Drupal::config('system.site')->get('name'),
+        'name' => $this->configSystemSite->get('name'),
         'sameAs' => $host,
         'url' => $host,
       ],
       'publisher' => [
-        '@context' => 'http://schema.org',
+        '@context' => 'https://schema.org',
         '@type' => 'Organization',
-        'name' => \Drupal::config('system.site')->get('name'),
+        'name' => $this->configSystemSite->get('name'),
         'sameAs' => $host,
         'url' => $host,
       ],

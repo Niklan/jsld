@@ -35,7 +35,11 @@ drush generate plugin-jsld-path
 
 namespace Drupal\MODULENAME\Plugin\jsld\path;
 
+use Drupal\Core\Config\ImmutableConfig;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\jsld\Plugin\jsld\JsldPathPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @JsldPath(
@@ -44,18 +48,38 @@ use Drupal\jsld\Plugin\jsld\JsldPathPluginBase;
  *   match_path = {"*"}
  * )
  */
-class Organization extends JsldPathPluginBase {
+class Organization extends JsldPathPluginBase implements ContainerFactoryPluginInterface {
+
+   /**
+   * The current request.
+   */
+  protected Request $request;
 
   /**
-   * @return array
-   *   The JsonLD array.
+   * The config system site.
+   */
+  protected ImmutableConfig $configSystemSite;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container,array $configuration,$plugin_id,$plugin_definition){
+    $instance = new static($configuration, $plugin_id, $plugin_definition);
+    $instance->request = $container->get('request_stack')->getCurrentRequest();
+    $instance->configSystemSite = $container->get('config.factory')->get('system.site');
+
+    return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function build() {
-    $host = \Drupal::request()->getSchemeAndHttpHost();
+    $host = $this->request->getSchemeAndHttpHost();
     return [
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'Organization',
-      'name' => \Drupal::config('system.site')->get('name'),
+      'name' => $this->configSystemSite->get('name'),
       'sameAs' => $host,
       'url' => $host,
     ];

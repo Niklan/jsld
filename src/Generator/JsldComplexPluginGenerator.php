@@ -40,7 +40,8 @@ class JsldComplexPluginGenerator extends BaseGenerator {
    * {@inheritdoc}
    */
   protected function interact(InputInterface $input, OutputInterface $output) {
-    $questions = Utils::pluginQuestions();
+    $questions = Utils::moduleQuestions();
+    $questions += Utils::pluginQuestions();
 
     $this->askForStructuredDataType($questions);
     $this->askForPluginType($questions);
@@ -75,7 +76,7 @@ class JsldComplexPluginGenerator extends BaseGenerator {
     $vars = &$this->collectVars($input, $output, $questions, $vars);
 
     $this->addFile()
-      ->path('src/Plugin/jsld/{jsld_plugin_type}/{name}.php')
+      ->path('src/Plugin/jsld/{jsld_plugin_type}/{class}.php')
       ->template($vars['structured_data_type'] . '.html.twig');
   }
 

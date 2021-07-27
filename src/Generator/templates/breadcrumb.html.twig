@@ -2,14 +2,13 @@
 
 namespace Drupal\{{ machine_name }}\Plugin\jsld\path;
 
-use Drupal\Core\Breadcrumb\BreadcrumbManager;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\jsld\Plugin\jsld\JsldPathPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Structured data for {{ name }}.
+ * Structured data for {{ plugin_label }}.
  *
  * @JsldPath(
  *   id = "{{ plugin_id }}",
@@ -17,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   match_path = {"<front>", "/admin*"}
  * )
  */
-class {{ name }} extends JsldPathPluginBase {
+class {{ class }} extends JsldPathPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * Breadcrumb manager.
@@ -36,23 +35,12 @@ class {{ name }} extends JsldPathPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, BreadcrumbManager $breadcrumb_manager, RouteMatchInterface $routeMatch) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->breadcrumbManager = $breadcrumb_manager;
-    $this->routeMatch = $routeMatch;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   static public function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('breadcrumb'),
-      $container->get('current_route_match')
-    );
+    $instance = new static($configuration, $plugin_id, $plugin_definition);
+    $instance->breadcrumbManager = $container->get('breadcrumb');
+    $instance->routeMatch = $container->get('current_route_match');
+
+    return $instance;
   }
 
   /**

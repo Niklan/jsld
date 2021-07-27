@@ -2,8 +2,9 @@
 
 namespace Drupal\jsld\EventSubscriber;
 
+use Drupal\jsld\Service\JsldGlobal;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -12,21 +13,40 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class JsldSubscriber implements EventSubscriberInterface {
 
   /**
-   * Init global service variable.
+   * The service collect all data during request.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
-   *   Response event.
+   * @var \Drupal\jsld\Service\JsldGlobal
    */
-  public function jsldInit(GetResponseEvent $event) {
-    \Drupal::service('jsld.global')->init();
+  protected $jsldGlobal;
+
+
+  /**
+   * JsldSubscriber constructor.
+   *
+   * @param \Drupal\jsld\Service\JsldGlobal $jsld_global
+   *  The service collect all data during request.
+   */
+  public function __construct(JsldGlobal $jsld_global) {
+    $this->jsldGlobal = $jsld_global;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[KernelEvents::REQUEST][] = ['jsldInit'];
-    return $events;
+    return [
+      KernelEvents::REQUEST => 'jsldInit'
+    ];
+  }
+
+  /**
+   * Init global service variable.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   *   Response event.
+   */
+  public function jsldInit(RequestEvent $event) {
+    $this->jsldGlobal->init();
   }
 
 }

@@ -9,8 +9,9 @@ services:
 
   event.subscruber.jsld:
     class: Drupal\jsld\EventSubscriber\JsldSubscriber
+    arguments: ['@jsld.global']
     tags:
-    - { name: event_subscriber }
+      - { name: event_subscriber }
 
   jsld.global:
     class: Drupal\jsld\Service\JsldGlobal

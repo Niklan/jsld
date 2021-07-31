@@ -69,7 +69,7 @@ function jsld_preprocess_html(&$variables) {
   $current_path_alias = $alias_manager->getAliasByPath($current_path);
   foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
     $pattern = implode(PHP_EOL, $plugin['match_path']);
-    $is_match_path = $path_matcher->matchPath($current_path_alias, $pattern);
+    $is_match_path = $path_matcher->matchPath($current_path_alias, $pattern) || $path_matcher->matchPath($current_path, $pattern);
     switch ($plugin['match_type']) {
       case JsldPathPluginBase::MATCH_TYPE_LISTED:
       default:

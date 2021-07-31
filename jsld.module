@@ -65,9 +65,11 @@ function jsld_preprocess_html(&$variables) {
   $plugin_service = \Drupal::service('plugin.manager.jsld.path');
   $path_matcher = \Drupal::service('path.matcher');
   $current_path = \Drupal::service('path.current')->getPath();
+  $alias_manager = \Drupal::service('path_alias.manager');
+  $current_path_alias = $alias_manager->getAliasByPath($current_path);
   foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
     $pattern = implode(PHP_EOL, $plugin['match_path']);
-    $is_match_path = $path_matcher->matchPath($current_path, $pattern);
+    $is_match_path = $path_matcher->matchPath($current_path_alias, $pattern);
     switch ($plugin['match_type']) {
       case JsldPathPluginBase::MATCH_TYPE_LISTED:
       default:

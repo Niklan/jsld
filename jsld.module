@@ -93,6 +93,10 @@ function jsld_preprocess_html(&$variables) {
   $jsld = $jsld_global->get();
   if (!empty($jsld)) {
     foreach ($jsld as $jsld_structured_data) {
+      if (empty($jsld_structured_data)) {
+        continue;
+      }
+      
       $variables['page_bottom'][] = [
         '#type' => 'html_tag',
         '#tag' => 'script',

@@ -7,7 +7,7 @@
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\jsld\Plugin\jsld\JsldPathPluginBase;
+use Drupal\jsld\Enum\PathMatchType;
 use Psy\Util\Json;
 
 /**
@@ -59,7 +59,7 @@ function jsld_entity_limit($bundle, $view_mode, $limits = []) {
 /**
  * Implements hook_preprocess_HOOK().
  */
-function jsld_preprocess_html(&$variables) {
+function jsld_preprocess_html(&$variables): void {
   $jsld_global = \Drupal::service('jsld.global');
   // Path plugins.
   $plugin_service = \Drupal::service('plugin.manager.jsld.path');
@@ -67,44 +67,53 @@ function jsld_preprocess_html(&$variables) {
   $current_path = \Drupal::service('path.current')->getPath();
   $alias_manager = \Drupal::service('path_alias.manager');
   $current_path_alias = $alias_manager->getAliasByPath($current_path);
+
   foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
-    $pattern = implode(PHP_EOL, $plugin['match_path']);
+    $match_path = $plugin['match_path'];
+    $match_type = $plugin['match_type'] ?? PathMatchType::Listed;
+
+    if (\is_string($match_type)) {
+      $match_type = PathMatchType::from($match_type);
+    }
+
+    $pattern = \implode(PHP_EOL, $match_path);
     $is_match_path = $path_matcher->matchPath($current_path_alias, $pattern) || $path_matcher->matchPath($current_path, $pattern);
-    switch ($plugin['match_type']) {
-      case JsldPathPluginBase::MATCH_TYPE_LISTED:
-      default:
-        $match_type = 0;
-        break;
 
-      case JsldPathPluginBase::MATCH_TYPE_UNLISTED:
-        $match_type = 1;
-        break;
+    if ($is_match_path && $match_type === PathMatchType::Unlisted) {
+      continue;
     }
-    $is_need_jsld = ($is_match_path xor $match_type);
-    if ($is_need_jsld) {
-      $instance = $plugin_service->createInstance($plugin_id);
 
-      if ($instance->isEnabled()) {
-        $jsld_global->add($instance->build());
-      }
+    if (!$is_match_path && $match_type === PathMatchType::Listed) {
+      continue;
     }
+
+    $instance = $plugin_service->createInstance($plugin_id);
+
+    if (!$instance->isEnabled()) {
+      continue;
+    }
+
+    $jsld_global->add($instance->build());
   }
 
   $jsld = $jsld_global->get();
-  if (!empty($jsld)) {
-    foreach ($jsld as $jsld_structured_data) {
-      if (empty($jsld_structured_data)) {
-        continue;
-      }
-      
-      $variables['page_bottom'][] = [
-        '#type' => 'html_tag',
-        '#tag' => 'script',
-        '#attributes' => [
-          'type' => 'application/ld+json',
-        ],
-        '#value' => Json::encode($jsld_structured_data),
-      ];
+
+  if (\count($jsld) === 0) {
+    return;
+  }
+
+  foreach ($jsld as $jsld_structured_data) {
+    if (!\is_array($jsld_structured_data) || \count($jsld_structured_data) === 0) {
+      continue;
     }
+
+    $variables['page_bottom'][] = [
+      '#type' => 'html_tag',
+      '#tag' => 'script',
+      '#attributes' => [
+        'type' => 'application/ld+json',
+      ],
+      '#value' => Json::encode($jsld_structured_data),
+    ];
   }
 }

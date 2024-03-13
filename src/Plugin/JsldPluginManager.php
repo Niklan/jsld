@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Drupal\jsld\Plugin;
 
@@ -27,16 +27,23 @@ class JsldPluginManager extends DefaultPluginManager {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    */
-  public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(string $type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+    $plugin_definition_attribute_name = 'Drupal\jsld\Attribute\Jsld' . Container::camelize($type);
     $plugin_definition_annotation_name = 'Drupal\jsld\Annotation\Jsld' . Container::camelize($type);
-    parent::__construct("Plugin/jsld/$type", $namespaces, $module_handler, 'Drupal\jsld\Plugin\jsld\JsldPluginInterface', $plugin_definition_annotation_name);
 
-    $this->defaults += [
-      'plugin_type' => $type,
-    ];
+    parent::__construct(
+      'Plugin/jsld/' . $type,
+      $namespaces,
+      $module_handler,
+      'Drupal\jsld\Plugin\jsld\JsldPluginInterface',
+      $plugin_definition_attribute_name,
+      $plugin_definition_annotation_name,
+    );
+
+    $this->defaults += ['plugin_type' => $type];
 
     $this->alterInfo('jsld_plugins_' . $type);
-    $this->setCacheBackend($cache_backend, "jsld:$type");
+    $this->setCacheBackend($cache_backend, 'jsld:' . $type);
   }
 
 }

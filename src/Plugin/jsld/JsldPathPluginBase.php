@@ -1,46 +1,33 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Drupal\jsld\Plugin\jsld;
 
+use Drupal\Component\Plugin\PluginBase;
+
 /**
- * Class JsldPathPluginBase
+ * The abstract base class for path jsld plugin.
  */
-abstract class JsldPathPluginBase extends JsldPluginBase implements JsldPluginInterface {
-
-  /**
-   * Match passed paths.
-   */
-  const MATCH_TYPE_LISTED = 'listed';
-
-  /**
-   * Shows only if path not in match path.
-   */
-  const MATCH_TYPE_UNLISTED = 'unlisted';
+abstract class JsldPathPluginBase extends PluginBase implements JsldPluginInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function build() {
-    return [];
+  public function getId(): string {
+    return $this->pluginDefinition['id'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getConfiguration() {
+  public function getConfiguration(): array {
     return $this->configuration;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isEnabled() {
-    if (isset($this->pluginDefinition['enabled'])) {
-      return $this->pluginDefinition['enabled'];
-    }
-    else {
-      return TRUE;
-    }
+  public function isEnabled(): bool {
+    return $this->pluginDefinition['enabled'] ?? TRUE;
   }
 
 }

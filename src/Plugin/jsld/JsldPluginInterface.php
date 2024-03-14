@@ -1,27 +1,27 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Drupal\jsld\Plugin\jsld;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 
 /**
- * {@inheritdoc}
+ * Defines jsld plugin.
  */
 interface JsldPluginInterface extends PluginInspectionInterface {
 
   /**
    * Return plugin ID.
    */
-  public function getId();
+  public function getId(): string;
 
   /**
    * Plugin status.
    *
    * @return bool
-   *   Plugin status. By default all plugin are enabled, but some can be
+   *   Plugin status. By default, all plugin are enabled, but some can be
    *   disabled for many reasons.
    */
-  public function isEnabled();
+  public function isEnabled(): bool;
 
   /**
    * Build result array with structured data.
@@ -29,7 +29,7 @@ interface JsldPluginInterface extends PluginInspectionInterface {
    * @return array
    *   An array with JSON-LD structured data.
    */
-  public function build();
+  public function build(): array;
 
   /**
    * Returns array with configurations.
@@ -37,6 +37,6 @@ interface JsldPluginInterface extends PluginInspectionInterface {
    * @return array
    *   An array with plugin configs.
    */
-  public function getConfiguration();
+  public function getConfiguration(): array;
 
 }

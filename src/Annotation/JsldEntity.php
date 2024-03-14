@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Drupal\jsld\Annotation;
 
@@ -16,20 +16,20 @@ class JsldEntity extends Plugin {
    *
    * @var int
    */
-  public $id;
+  public int $id;
 
   /**
    * Define is current plugin enabled or not.
    *
-   * By default all plugins enabled, this is needed when some plugins want's to
-   * be disabled for some reasons.
+   * By default, all plugins enabled, this is needed when some plugins want's to
+   * be disabled for some reason.
    *
    * TRUE - enabled.
    * FALSE - disabled.
    *
    * @var bool
    */
-  public $enabled;
+  public bool $enabled;
 
   /**
    * Entity type to execute this plugin for.
@@ -41,7 +41,7 @@ class JsldEntity extends Plugin {
    * @var string
    *   Entity type ID.
    */
-  public $entity_type;
+  public string $entity_type;
 
   /**
    * Entity limitation.
@@ -57,6 +57,6 @@ class JsldEntity extends Plugin {
    *
    * @var array
    */
-  public $entity_limit;
+  public array $entity_limit;
 
 }

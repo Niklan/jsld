@@ -18,11 +18,9 @@ function jsld_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
     $entity_type = $entity->getEntityTypeId();
     $plugin_service = \Drupal::service('plugin.manager.jsld.entity');
     foreach ($plugin_service->getDefinitions() as $plugin_id => $plugin) {
-      if ($plugin['entity_type'] == $entity_type && jsld_entity_limit($entity->bundle(), $view_mode, $plugin['entity_limit'])) {
+      if ($plugin['entity_type'] === $entity_type && jsld_entity_limit($entity->bundle(), $view_mode, $plugin['entity_limit'])) {
         $instance = $plugin_service->createInstance($plugin_id, [
           'entity' => $entity,
-          'entity_type' => $entity_type,
-          'bundle' => $entity->bundle(),
           'view_mode' => $view_mode,
         ]);
 

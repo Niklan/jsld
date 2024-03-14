@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Drupal\jsld\Annotation;
 
@@ -14,44 +14,44 @@ class JsldPath extends Plugin {
   /**
    * Plugin ID.
    *
-   * @var int
+   * @var string
    */
-  public $id;
+  public string $id;
 
   /**
    * Define is current plugin enabled or not.
    *
-   * By default all plugins enabled, this is needed when some plugins want's to
-   * be disabled for some reasons.
+   * By default, all plugins enabled, this is needed when some plugins want's to
+   * be disabled for some reason.
    *
    * TRUE - enabled.
    * FALSE - disabled.
    *
    * @var bool
    */
-  public $enabled;
+  public bool $enabled;
 
   /**
    * Paths to match.
    *
    * Array with paths to limit execution. Works with "match_type" and depends on
-   * it's value. Can contain wildcard ("*") and Drupal placeholders ("<front>").
+   * its value. Can contain wildcard ("*") and Drupal placeholders ("<front>").
    *
    * E.g. {"<front>", "/node/*", "/news/*"}
    *
    * @var array
    */
-  public $match_path;
+  public array $match_path;
 
   /**
    * Match type for "path" type plugin restriction.
    *
    * Can be set as:
    * - "listed": (default) show only on pages which listed in array.
-   * - "unlisted": for all pages which do'nt match defined in "match_path".
+   * - "unlisted": for all pages which don't match defined in "match_path".
    *
    * @var string.
    */
-  public $match_type;
+  public string $match_type;
 
 }

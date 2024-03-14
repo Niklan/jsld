@@ -1,18 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Drupal\jsld\Plugin\jsld;
 
+use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Entity\EntityInterface;
+
 /**
- * Base plugin for entity based structured data.
+ * The abstract base class for entity jsld plugin.
  */
-abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPluginInterface {
+abstract class JsldEntityPluginBase extends PluginBase implements JsldPluginInterface {
 
   /**
    * An object of current entity.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface
    */
-  public $entity;
+  protected EntityInterface $entity;
 
   /**
    * JsldEntityPluginBase constructor.
@@ -24,7 +25,7 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(array $configuration, string $plugin_id, mixed $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entity = $this->configuration['entity'];
   }
@@ -32,75 +33,42 @@ abstract class JsldEntityPluginBase extends JsldPluginBase implements JsldPlugin
   /**
    * {@inheritdoc}
    */
-  public function build() {
-    return [];
+  public function getId(): string {
+    return $this->pluginDefinition['id'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getConfiguration() {
+  public function getConfiguration(): array {
     return $this->configuration;
   }
 
   /**
-   * Return entity object.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|null
-   *   The current entity object.
+   * {@inheritdoc}
    */
-  public function entity() {
-    return $this->configuration['entity'];
+  public function isEnabled(): bool {
+    return $this->pluginDefinition['enabled'] ?? TRUE;
   }
 
   /**
-   * Return entity type id.
+   * Gets entity object.
    *
-   * @return string
-   *   Entity type name or empty string, if some problems happens.
+   * @return \Drupal\Core\Entity\EntityInterface
+   *    The current entity object.
    */
-  public function getEntityTypeId() {
-    if (isset($this->configuration['entity_type'])) {
-      return $this->configuration['entity_type'];
-    }
-    elseif ($entity = $this->entity()) {
-      return $entity->getEntityTypeId();
-    }
-    else {
-      return '';
-    }
+  public function getEntity(): EntityInterface {
+    return $this->entity;
   }
 
   /**
-   * Return bundle context.
-   *
-   * @return string
-   *   Entity bundle name.
-   */
-  public function bundle() {
-    return $this->configuration['bundle'];
-  }
-
-  /**
-   * Return view mode context.
+   * Gets view mode context.
    *
    * @return string
    *   View mode of entity requested JSON-LD.
    */
-  public function viewMode() {
+  public function getViewMode(): string {
     return $this->configuration['view_mode'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function isEnabled() {
-    if (isset($this->pluginDefinition['enabled'])) {
-      return $this->pluginDefinition['enabled'];
-    }
-    else {
-      return TRUE;
-    }
   }
 
 }

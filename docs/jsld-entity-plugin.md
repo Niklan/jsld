@@ -1,32 +1,30 @@
 # Entity Plugin
 
-Entity plugins is attached for specific entity type and their bundle\view-mode combinations.
+Entity plugins is attached for specific entity type and their bundle\view-mode
+combinations.
 
-It's used when you need to add JSON-LD on pages where specific entity is presented.
+It's used when you need to add JSON-LD on pages where specific entity is
+presented.
 
 **Annotation example**
 
 ```php
-/**
- * @JsldEntity(
- *   id = "node_news",
- *   entity_type = "node",
- *   entity_limit = {"news|*", "page|full"}
- * )
- */
+use Drupal\jsld\Attribute\JsldEntity;
+
+#[JsldEntity(
+  id: "node_news",
+  entity_type: "node",
+  entity_limit: ["news|*", "page|full"],
+)]
 ```
 
 - id: Machine name for plugin.
 - entity_type: Entity type ID on which this plugin is fired.
-- entity_limit: An array of limitation inside entity type. Have structure `BUNDLE|VIEW_MODE`. Supports for wildcard `*` in both parts. If you set `*|*`, that plugin will be attached to all entities of this type, on every view mode.
+- entity_limit: An array of limitation inside entity type. Have structure
+`BUNDLE|VIEW_MODE`. Supports for wildcard `*` in both parts. If you set `*|*`,
+that plugin will be attached to all entities of this type, on every view mode.
 
-This plugins is stored in `/src/Plugin/jsld/entity/` path.
-
-## Generate plugin
-
-```sh
-drush generate plugin-jsld-entity
-```
+These plugins are stored in `/src/Plugin/jsld/entity/` path.
 
 ## Example of plugin
 
@@ -35,47 +33,47 @@ drush generate plugin-jsld-entity
 
 namespace Drupal\MODULENAME\Plugin\jsld\entity;
 
-use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\jsld\Attribute\JsldEntity;
+use Drupal\jsld\Enum\PathMatchType;
 use Drupal\jsld\Plugin\jsld\JsldEntityPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * @JsldEntity(
- *   id = "node_news",
- *   entity_type = "node",
- *   entity_limit = {"news|*"}
- * )
- */
-class NodeNews extends JsldEntityPluginBase implements ContainerFactoryPluginInterface {
+#[JsldEntity(
+  id: "node_news",
+  entity_type: "node",
+  entity_limit: ["news|*"],
+)]
+final class NodeNews extends JsldEntityPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The current request.
+   * The request stack.
    */
-  protected Request $request;
+  protected RequestStack $requestStack;
 
   /**
-   * The config system site.
+   * The config factory.
    */
-  protected ImmutableConfig $configSystemSite;
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * The date formatter service.
    */
-  protected ?DateFormatterInterface $dateFormatter;
+  protected DateFormatterInterface $dateFormatter;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container,array $configuration,$plugin_id,$plugin_definition){
-    $instance = new static($configuration, $plugin_id, $plugin_definition);
-    $instance->request = $container->get('request_stack')->getCurrentRequest();
-    $instance->configSystemSite = $container->get('config.factory')->get('system.site');
-    $instance->dateFormatter = $container->get('date.formatter');
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    $instance = new self($configuration, $plugin_id, $plugin_definition);
+    $instance->requestStack = $container->get(RequestStack::class);
+    $instance->configFactory = $container->get(ConfigFactoryInterface::class);
+    $instance->dateFormatter = $container->get(DateFormatterInterface::class);
 
     return $instance;
   }
@@ -83,44 +81,54 @@ class NodeNews extends JsldEntityPluginBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public function build() {
-    $host = $this->request->getSchemeAndHttpHost();
+  public function build(): array {
+    $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+    $config_system_site = $this->configFactory->get('system.site');
+
     $result = [
       '@context' => 'https://schema.org',
       '@type' => 'Article',
-      'name' => $this->entity->label(),
-      'headline' => $this->entity->label(),
-      'url' => $this->entity->toUrl('canonical', ['absolute' => TRUE]),
-      'mainEntityOfPage' => $this->entity->toUrl('canonical', ['absolute' => TRUE]),
-      'datePublished' => $this->dateFormatter->format($this->entity->created->value),
-      'dateModified' => $this->dateFormatter->format($this->entity->changed->value),
+      'name' => $this->getEntity()->label(),
+      'headline' => $this->getEntity()->label(),
+      'url' => $this->getEntity()->toUrl('canonical', ['absolute' => TRUE]),
+      'mainEntityOfPage' => $this->getEntity()->toUrl('canonical', ['absolute' => TRUE]),
+      'datePublished' => $this->dateFormatter->format($this->getEntity()->created->value),
+      'dateModified' => $this->dateFormatter->format($this->getEntity()->changed->value),
       'author' => [
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
-        'name' => $this->configSystemSite->get('name'),
+        'name' => $config_system_site->get('name'),
         'sameAs' => $host,
         'url' => $host,
       ],
       'publisher' => [
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
-        'name' => $this->configSystemSite->get('name'),
+        'name' => $config_system_site->get('name'),
         'sameAs' => $host,
         'url' => $host,
       ],
     ];
 
-    if (!$this->entity->field_news_promo->isEmpty()) {
-      $image_url = ImageStyle::load('medium')
-        ->buildUrl($this->entity->field_news_promo->entity->uri->value);
-      $url = new UrlHelper();
-      // This helps to use URL without query parameters.
-      $url_parts = $url->parse($image_url);
-      $result['image'] = [
-        '@type' => 'ImageObject',
-        'url' => $url_parts['path'],
-      ];
+    if ($this->getEntity()->get('field_news_promo')->isEmpty()) {
+      return $result;
     }
+
+    $image = $this->getEntity()->get('field_news_promo')->first()->getEntity();
+
+    if (!isset($image)) {
+      return $result;
+    }
+
+    $image_url = ImageStyle::load('medium')->buildUrl($image->get('uri')->first()->getValue());
+    // This helps to use URL without query parameters.
+    $url_parts = (new UrlHelper())->parse($image_url);
+
+    $result['image'] = [
+      '@type' => 'ImageObject',
+      'url' => $url_parts['path'],
+    ];
+
     return $result;
   }
 

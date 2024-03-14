@@ -1,5 +1,0 @@
-services:
-  jsld.generator:
-    class: Drupal\jsld\Generator\JsldComplexPluginGenerator
-    tags:
-      - { name: drush.generator }

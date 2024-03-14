@@ -29,7 +29,7 @@ These plugins are stored in `/src/Plugin/jsld/entity/` path.
 ## Example of plugin
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 namespace Drupal\MODULENAME\Plugin\jsld\entity;
 

@@ -4,15 +4,11 @@
 
 No changes at this moment.
 
-## [1.0-alpha2]
+## [1.3]
 
-- Improved documentation.
-- Improved code quality.
-- Added container injection support for plugins.
-- Removed request() method from JsldPathPlugin, use container injection instead.
-- Improved plugin generators for Drush. Now they with examples of container injection.
-- From now, each structured data from plugin will have a personal script tag with data, not all in one place.
-- Refactored Drush generator command `drush generate jsld`.
-- Added predefined examples for common structured data type when using drush generator.
+### Changed
 
-[1.0-alpha2]: https://github.com/Niklan/jsld/compare/8.x-1.0-alpha1...8.x-1.0-alpha2
+- `JsldGlobal` service is depricated. He basically has no use.
+- Schema moved to the `html_head`, because of problems with the caching in the footer. `#attached` is processed properly no matter what, while `page_bottom` is heavily cached. This is visible on multilingual websites.
+
+[1.3]: https://github.com/Niklan/jsld/compare/8.x-1.2...8.x-1.3

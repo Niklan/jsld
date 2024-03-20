@@ -4,6 +4,9 @@ namespace Drupal\jsld\Service;
 
 /**
  * Service to collect all data during request.
+ *
+ * @deprecated since 1.3, since it has issues with caching. Will be removed in
+ *   2.0+.
  */
 class JsldGlobal {
 
@@ -50,3 +53,4 @@ class JsldGlobal {
   }
 
 }
+

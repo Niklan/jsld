@@ -27,8 +27,17 @@ function jsld_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
         ]);
 
         if ($instance->isEnabled()) {
-          $jsld_global = \Drupal::service('jsld.global');
-          $jsld_global->add($instance->build());
+          $build['#attached']['html_head'][] = [
+            [
+              '#type' => 'html_tag',
+              '#tag' => 'script',
+              '#attributes' => [
+                'type' => 'application/ld+json',
+              ],
+              '#value' => Json::encode($instance->build()),
+            ],
+            "jsld_{$plugin_id}",
+          ];
         }
       }
     }
@@ -46,7 +55,7 @@ function jsld_entity_limit($bundle, $view_mode, $limits = []) {
       continue;
     }
 
-    list($limit_bundle, $limit_view_mode) = explode('|', $limit);
+    [$limit_bundle, $limit_view_mode] = explode('|', $limit);
     if (($bundle == $limit_bundle || $limit_bundle == '*') && ($view_mode == $limit_view_mode || $limit_view_mode == '*')) {
       $valid = TRUE;
       break;
@@ -85,26 +94,19 @@ function jsld_preprocess_html(&$variables) {
       $instance = $plugin_service->createInstance($plugin_id);
 
       if ($instance->isEnabled()) {
-        $jsld_global->add($instance->build());
+        $variables['#attached']['html_head'][] = [
+          [
+            '#type' => 'html_tag',
+            '#tag' => 'script',
+            '#attributes' => [
+              'type' => 'application/ld+json',
+            ],
+            '#value' => Json::encode($instance->build()),
+          ],
+          "jsld_{$plugin_id}",
+        ];
       }
-    }
-  }
-
-  $jsld = $jsld_global->get();
-  if (!empty($jsld)) {
-    foreach ($jsld as $jsld_structured_data) {
-      if (empty($jsld_structured_data)) {
-        continue;
-      }
-      
-      $variables['page_bottom'][] = [
-        '#type' => 'html_tag',
-        '#tag' => 'script',
-        '#attributes' => [
-          'type' => 'application/ld+json',
-        ],
-        '#value' => Json::encode($jsld_structured_data),
-      ];
     }
   }
 }
+

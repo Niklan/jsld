@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\jsld\Annotation;
 
@@ -9,12 +11,10 @@ use Drupal\Component\Annotation\Plugin;
  *
  * @Annotation
  */
-class JsldPath extends Plugin {
+final class JsldPath extends Plugin {
 
   /**
    * Plugin ID.
-   *
-   * @var string
    */
   public string $id;
 
@@ -26,8 +26,6 @@ class JsldPath extends Plugin {
    *
    * TRUE - enabled.
    * FALSE - disabled.
-   *
-   * @var bool
    */
   public bool $enabled;
 
@@ -38,8 +36,6 @@ class JsldPath extends Plugin {
    * its value. Can contain wildcard ("*") and Drupal placeholders ("<front>").
    *
    * E.g. {"<front>", "/node/*", "/news/*"}
-   *
-   * @var array
    */
   public array $match_path;
 
@@ -49,8 +45,6 @@ class JsldPath extends Plugin {
    * Can be set as:
    * - "listed": (default) show only on pages which listed in array.
    * - "unlisted": for all pages which don't match defined in "match_path".
-   *
-   * @var string.
    */
   public string $match_type;
 

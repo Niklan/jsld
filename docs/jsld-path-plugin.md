@@ -29,7 +29,9 @@ This plugins is stored in `/src/Plugin/jsld/path/` path.
 ## Example of plugin
 
 ```php
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\MODULENAME\Plugin\jsld\path;
 

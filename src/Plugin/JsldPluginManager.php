@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\jsld\Plugin;
 
@@ -12,7 +14,7 @@ use Symfony\Component\DependencyInjection\Container;
  *
  * @ingroup jsld_plugins
  */
-class JsldPluginManager extends DefaultPluginManager {
+final class JsldPluginManager extends DefaultPluginManager {
 
   /**
    * Constructs a JsldPluginManager object.

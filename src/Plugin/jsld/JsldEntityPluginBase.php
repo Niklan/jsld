@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\jsld\Plugin\jsld;
 
@@ -55,7 +57,7 @@ abstract class JsldEntityPluginBase extends PluginBase implements JsldPluginInte
    * Gets entity object.
    *
    * @return \Drupal\Core\Entity\EntityInterface
-   *    The current entity object.
+   *   The current entity object.
    */
   public function getEntity(): EntityInterface {
     return $this->entity;

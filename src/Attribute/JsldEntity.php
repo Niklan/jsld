@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\jsld\Attribute;
 
@@ -20,9 +22,9 @@ final class JsldEntity extends Plugin {
    * @param array $entity_limit
    *   Entity limitation. E.g. {"news|teaser", "review|*"}.
    * @param bool $enabled
-   * *   Define is current plugin enabled or not.
-   * * @param string|null $deriver
-   * *   The deriver class.
+   *   Define is current plugin enabled or not.
+   * @param string|null $deriver
+   *   The deriver class.
    */
   public function __construct(
     public readonly string $id,

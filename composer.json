@@ -1,0 +1,42 @@
+{
+    "name": "drupal/jsld",
+    "type": "drupal-module",
+    "description": "The simple API for add Json-LD support to your site by using Plugin system.",
+    "keywords": [
+        "Drupal"
+    ],
+    "license": "GPL-2.0+",
+    "homepage": "https://www.drupal.org/project/jsld",
+    "require": {
+        "php": ">=8.1",
+        "drupal/core": "^10"
+    },
+    "require-dev": {
+        "chi-teck/drupal-coder-extension": "^2.0.0-beta2"
+    },
+    "scripts": {
+        "phpcs": "vendor/bin/phpcs -ps",
+        "phpcbf": "vendor/bin/phpcbf"
+    },
+    "authors": [
+        {
+            "name": "Nikita Malyshev (Niklan)",
+            "homepage": "https://niklan.net",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Contributors",
+            "homepage": "https://www.drupal.org/node/NID/committers",
+            "role": "Contributors"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/Niklan/jsld/issues",
+        "source": "http://cgit.drupalcode.org/jsld"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

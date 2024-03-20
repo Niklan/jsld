@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\jsld\Enum;
 
@@ -7,14 +9,10 @@ namespace Drupal\jsld\Enum;
  */
 enum PathMatchType: string {
 
-  /**
-   * Match passed paths.
-   */
+  /* Match passed paths. */
   case Listed = 'listed';
 
-  /**
-   * Shows only if path not in match path.
-   */
+  /* Shows only if path not in match path. */
   case Unlisted = 'unlisted';
 
 }

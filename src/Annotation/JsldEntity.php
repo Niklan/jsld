@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Drupal\jsld\Annotation;
 
@@ -9,14 +11,12 @@ use Drupal\Component\Annotation\Plugin;
  *
  * @Annotation
  */
-class JsldEntity extends Plugin {
+final class JsldEntity extends Plugin {
 
   /**
    * Plugin ID.
-   *
-   * @var int
    */
-  public int $id;
+  public string $id;
 
   /**
    * Define is current plugin enabled or not.
@@ -26,8 +26,6 @@ class JsldEntity extends Plugin {
    *
    * TRUE - enabled.
    * FALSE - disabled.
-   *
-   * @var bool
    */
   public bool $enabled;
 
@@ -37,9 +35,6 @@ class JsldEntity extends Plugin {
    * Only one entity type id can be set for single plugin.
    *
    * E.g. "node".
-   *
-   * @var string
-   *   Entity type ID.
    */
   public string $entity_type;
 
@@ -54,8 +49,6 @@ class JsldEntity extends Plugin {
    * in single plugin.
    *
    * E.g. {"news|teaser", "review|*"}
-   *
-   * @var array
    */
   public array $entity_limit;
 

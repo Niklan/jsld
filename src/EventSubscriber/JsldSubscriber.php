@@ -9,6 +9,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Event subscriber for initialisation of service.
+ *
+ * @deprecated since 1.3, since it has issues with caching. Will be removed in
+ *    2.0+.
  */
 class JsldSubscriber implements EventSubscriberInterface {
 
@@ -50,3 +53,4 @@ class JsldSubscriber implements EventSubscriberInterface {
   }
 
 }
+

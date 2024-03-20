@@ -25,8 +25,17 @@ function jsld_entity_view(array &$build, EntityInterface $entity, EntityViewDisp
         ]);
 
         if ($instance->isEnabled()) {
-          $jsld_global = \Drupal::service('jsld.global');
-          $jsld_global->add($instance->build());
+          $build['#attached']['html_head'][] = [
+            [
+              '#type' => 'html_tag',
+              '#tag' => 'script',
+              '#attributes' => [
+                'type' => 'application/ld+json',
+              ],
+              '#value' => Json::encode($instance->build()),
+            ],
+            "jsld_{$plugin_id}",
+          ];
         }
       }
     }
@@ -44,7 +53,7 @@ function jsld_entity_limit($bundle, $view_mode, $limits = []) {
       continue;
     }
 
-    list($limit_bundle, $limit_view_mode) = explode('|', $limit);
+    [$limit_bundle, $limit_view_mode] = explode('|', $limit);
     if (($bundle == $limit_bundle || $limit_bundle == '*') && ($view_mode == $limit_view_mode || $limit_view_mode == '*')) {
       $valid = TRUE;
       break;
@@ -58,7 +67,6 @@ function jsld_entity_limit($bundle, $view_mode, $limits = []) {
  * Implements hook_preprocess_HOOK().
  */
 function jsld_preprocess_html(&$variables): void {
-  $jsld_global = \Drupal::service('jsld.global');
   // Path plugins.
   $plugin_service = \Drupal::service('plugin.manager.jsld.path');
   $path_matcher = \Drupal::service('path.matcher');
@@ -86,32 +94,22 @@ function jsld_preprocess_html(&$variables): void {
     }
 
     $instance = $plugin_service->createInstance($plugin_id);
+    $build = $instance->build();
 
-    if (!$instance->isEnabled()) {
+    if (!$instance->isEnabled() || \count($build) === 0) {
       continue;
     }
 
-    $jsld_global->add($instance->build());
-  }
-
-  $jsld = $jsld_global->get();
-
-  if (\count($jsld) === 0) {
-    return;
-  }
-
-  foreach ($jsld as $jsld_structured_data) {
-    if (!\is_array($jsld_structured_data) || \count($jsld_structured_data) === 0) {
-      continue;
-    }
-
-    $variables['page_bottom'][] = [
-      '#type' => 'html_tag',
-      '#tag' => 'script',
-      '#attributes' => [
-        'type' => 'application/ld+json',
+    $variables['#attached']['html_head'][] = [
+      [
+        '#type' => 'html_tag',
+        '#tag' => 'script',
+        '#attributes' => [
+          'type' => 'application/ld+json',
+        ],
+        '#value' => Json::encode($build),
       ],
-      '#value' => Json::encode($jsld_structured_data),
+      "jsld_{$plugin_id}",
     ];
   }
 }

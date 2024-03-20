@@ -8,7 +8,7 @@
     "license": "GPL-2.0+",
     "homepage": "https://www.drupal.org/project/jsld",
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "drupal/core": "^10"
     },
     "require-dev": {
